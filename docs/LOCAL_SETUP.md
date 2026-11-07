@@ -2,6 +2,36 @@
 
 Esta fase permite crear/listar casos y consultar disponibilidad de Ollama. No importa logs, no ejecuta análisis ni genera informes todavía. No tiene autenticación: usar exclusivamente en un equipo de confianza, con puertos ligados a loopback; no publicar ni compartir por túneles.
 
+## Este equipo: inicio directo en Windows
+
+Los runtimes Node 24, Python 3.12 y Ollama se prepararon de forma local en `.tools/` y `.venv/`. No necesitan agregarse al PATH ni requieren Docker para usar esta fase. Estos binarios no se suben a GitHub; otro equipo debe instalar sus propios runtimes siguiendo las opciones de abajo.
+
+- Abrir `Iniciar-SOC.cmd` desde la raíz para iniciar Ollama, API e interfaz.
+- Visitar http://127.0.0.1:3000 en el navegador.
+- Abrir `Detener-SOC.cmd` para detener los procesos registrados, conservando datos y modelo.
+
+También se pueden ejecutar `powershell -File scripts/Start-Local.ps1 -WithAI` y `powershell -File scripts/Stop-Local.ps1`. Los scripts no cambian la política de ejecución de Windows; si una política corporativa los bloquea, debe resolverlo el administrador. No iniciar una segunda sesión cuando los servicios ya estén activos.
+
+En este equipo se autorizó RemoteSigned únicamente para el usuario actual de Windows PowerShell, porque su configuración inicial bloqueaba todos los scripts. Los scripts del proyecto no alteran esta preferencia durante el arranque.
+
+La base persistente es `.local/soc.db`; los modelos están en `.local/models/` y los logs de los servicios en `.local/`. El registro de procesos valida ejecutable y fecha de inicio antes de detener un proceso. No borres ni edites ese registro mientras los servicios estén activos. Si el inicio falla, revisa los logs y ejecuta el comando de detener antes de reintentar. Los datos de prueba de la entrega anterior están en una base separada.
+
+La primera descarga del modelo se hace con el servidor iniciado:
+
+```powershell
+.tools/ollama/ollama.exe pull qwen3:8b
+```
+
+No hace falta repetirla en cada arranque. Tras la descarga, recargar la interfaz para ver «Modelo disponible». Esta indicación verifica instalación, no habilita todavía el análisis de evidencias. Los procesos iniciados con estos scripts continúan en segundo plano; usar el comando de detener cuando termines.
+
+Para comprobar la web, la API y una respuesta real del modelo con un mensaje sintético:
+
+```powershell
+powershell -File scripts/Test-Local.ps1 -WithAI
+```
+
+La comprobación puede tardar varios minutos en CPU. Guarda métricas básicas en `.local/ai-smoke.json` y descarga el modelo de la memoria al terminar. No envía registros de clientes ni demuestra todavía la calidad del análisis SOC.
+
 ## Opción recomendada: Docker Desktop
 
 Instalar Docker Desktop desde su fuente oficial y habilitar su motor Linux. Desde la raíz:

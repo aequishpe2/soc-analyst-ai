@@ -6,6 +6,8 @@ Aplicación web planificada para apoyar a analistas SOC Nivel 2 en el análisis 
 
 Primera fase implementada: interfaz local, API de casos, migración inicial y diagnóstico de Ollama. La carga de logs, el análisis y el PDF todavía están pendientes.
 
+En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://127.0.0.1:3000`. Usar `Detener-SOC.cmd` al terminar. Las herramientas y el modelo se instalan fuera del control de versiones; un clon nuevo requiere seguir la guía de arranque.
+
 ## Documentación
 
 - [Arranque local y verificaciones](docs/LOCAL_SETUP.md)
