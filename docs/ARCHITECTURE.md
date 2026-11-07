@@ -1,6 +1,6 @@
 # Arquitectura propuesta
 
-Estado: diseño para la primera versión; no describe funcionalidades ya implementadas.
+Estado: diseño para la primera versión. La base de casos y el diagnóstico local están implementados; consultar LOCAL_SETUP.md y VERIFICATION.md para el alcance comprobado.
 
 ## Objetivo y límites
 
@@ -17,7 +17,7 @@ Una aplicación para investigar archivos SIEM de un cliente por caso, con eviden
 | Archivos | Volumen privado local; adaptador de almacenamiento futuro | Originales y PDF fuera del directorio público |
 | Importación | CSV estándar y openpyxl con defusedxml | Lectura controlada de archivos; sin ejecutar fórmulas |
 | PDF | ReportLab con plantilla versionada | Documento reproducible generado desde datos validados |
-| IA | Interfaz de proveedor intercambiable, desactivada por defecto | Análisis básico disponible sin credenciales ni transmisión externa |
+| IA | Ollama local con Qwen3-8B; herramientas de agente pendientes | Sin proveedor cloud ni fallback externo; diagnóstico disponible sin inferencia |
 | Entorno | Docker Compose | Servicios reproducibles para desarrollo local |
 
 Fijar versiones soportadas y lockfiles al implementar; revisar avisos de seguridad antes de instalarlas. Redis no será la fuente de verdad. Las tareas serán idempotentes, con estado persistente, límites y reintentos acotados.

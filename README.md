@@ -4,9 +4,11 @@ Aplicación web planificada para apoyar a analistas SOC Nivel 2 en el análisis 
 
 ## Estado
 
-Arquitectura y plan de desarrollo documentados. La aplicación todavía no está implementada.
+Primera fase implementada: interfaz local, API de casos, migración inicial y diagnóstico de Ollama. La carga de logs, el análisis y el PDF todavía están pendientes.
 
 ## Documentación
+
+- [Arranque local y verificaciones](docs/LOCAL_SETUP.md)
 
 - [Arquitectura y decisiones técnicas](docs/ARCHITECTURE.md)
 - [Contrato analítico, modelo de datos y API](docs/ANALYSIS_SPEC.md)

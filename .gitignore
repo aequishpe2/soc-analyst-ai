@@ -33,6 +33,12 @@ dist/
 coverage/
 
 # Local files
+.tools/
+.local/
+*.db
+*.db-*
+*.tsbuildinfo
+.turbo/
 *.log
 .DS_Store
 Thumbs.db
