@@ -4,7 +4,13 @@ Aplicación web planificada para apoyar a analistas SOC Nivel 2 en el análisis 
 
 ## Estado
 
-Repositorio inicial. La aplicación todavía no está implementada.
+Arquitectura y plan de desarrollo documentados. La aplicación todavía no está implementada.
+
+## Documentación
+
+- [Arquitectura y decisiones técnicas](docs/ARCHITECTURE.md)
+- [Contrato analítico, modelo de datos y API](docs/ANALYSIS_SPEC.md)
+- [Plan de desarrollo y criterios de aceptación](docs/ROADMAP.md)
 
 ## Funcionalidades previstas
 
