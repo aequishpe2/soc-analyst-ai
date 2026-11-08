@@ -89,7 +89,7 @@ npm run build
 npm audit --omit=dev --audit-level=high
 ```
 
-Crear un caso, abrirlo y cargar un archivo sintético. Revisar la vista previa, el mapeo y las opciones de fecha antes de confirmar. Comprobar que los conteos cuadran y abrir un evento para ver su hoja/fila original y hash. Con Ollama apagado, los casos y la importación deben seguir funcionando. Los listados están paginados. La aplicación sí conserva los archivos y eventos importados: requieren protección y no deben subirse al repositorio.
+Crear un caso, abrirlo y cargar un archivo sintético. Revisar la vista previa, el mapeo y el formato de fecha antes de confirmar. Comprobar que los conteos cuadran y abrir un evento para ver su hoja/fila original y hash. Con Ollama apagado, los casos y la importación deben seguir funcionando. Los listados están paginados. La aplicación sí conserva los archivos y eventos importados: requieren protección y no deben subirse al repositorio.
 
 ## Límites de esta entrega
 
@@ -98,3 +98,5 @@ Desde un caso, entrar en Análisis de seguridad, seleccionar revisiones y confir
 La cola es local y admite una sola instancia de API; Celery/Redis, revisión humana auditable, gráficos, agente de IA, PDF y OIDC están pendientes. No hay validación de despliegue compartido. Los tags de imágenes se fijan por versión principal o release; antes de producción se deberán fijar también digests y revisar su procedencia. La IA local reduce transmisión externa; no sustituye cifrado, control de acceso o seguridad del equipo.
 
 Fuentes: [Ollama: desactivar cloud](https://docs.ollama.com/faq), [Next.js: instalación](https://nextjs.org/docs/app/getting-started/installation).
+
+La creación de casos, la carga y el análisis no solicitan configuración horaria. Se utilizan las fechas del archivo automáticamente.

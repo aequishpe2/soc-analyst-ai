@@ -2,7 +2,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
-type Case = { id: string; title: string; timezone: string; created_at: string };
+type Case = { id: string; title: string; created_at: string };
 type System = { ai_status: string; model: string };
 
 export default function Home() {
@@ -13,7 +13,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState("");
-  const [timezone, setTimezone] = useState("Europe/Stockholm");
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
 
@@ -55,12 +54,12 @@ export default function Home() {
       const response = await fetch("/api/v1/cases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, timezone }),
+        body: JSON.stringify({ title }),
       });
       if (!response.ok)
         throw new Error(
           response.status === 422
-            ? "Revisa el título y la zona horaria IANA."
+            ? "Revisa el nombre de la investigación."
             : "No se pudo crear el caso.",
         );
       setTitle("");
@@ -169,7 +168,8 @@ export default function Home() {
                 </span>
                 <h3>Tu primer caso, un punto de partida.</h3>
                 <p>
-                  Crea una investigación para definir su alcance y zona horaria.
+                  Crea una investigación para organizar los registros del
+                  cliente.
                   <br />
                   Todavía no hay eventos ni hallazgos.
                 </p>
@@ -184,11 +184,9 @@ export default function Home() {
                     <div>
                       <h3>{c.title}</h3>
                       <p>
-                        {c.timezone} ·{" "}
                         {new Intl.DateTimeFormat("es", {
                           dateStyle: "medium",
                           timeStyle: "short",
-                          timeZone: c.timezone,
                         }).format(new Date(c.created_at))}
                       </p>
                       <small>{c.id}</small>
@@ -235,19 +233,6 @@ export default function Home() {
                 maxLength={200}
                 required
               />
-              <label htmlFor="timezone">Zona horaria de los registros</label>
-              <input
-                id="timezone"
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-                required
-                maxLength={100}
-                aria-describedby="tz-help"
-              />
-              <small id="tz-help">
-                Formato IANA. Confirma la zona del archivo; la ubicación del
-                cliente puede ser diferente.
-              </small>
               <button
                 className="primary"
                 disabled={saving || title.trim().length < 3}

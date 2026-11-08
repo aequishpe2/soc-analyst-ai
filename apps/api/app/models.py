@@ -74,6 +74,7 @@ class Event(Base):
     row: Mapped[int] = mapped_column(Integer)
     line_end: Mapped[int] = mapped_column(Integer)
     timestamp_utc: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    file_timestamp: Mapped[str | None] = mapped_column(String(40), nullable=True)
     normalized: Mapped[dict] = mapped_column(JSON)
     original: Mapped[list] = mapped_column(JSON)
     warnings: Mapped[list] = mapped_column(JSON)

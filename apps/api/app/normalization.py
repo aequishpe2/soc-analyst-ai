@@ -23,24 +23,30 @@ FIELDS = (
 DATE_FORMATS = ("iso8601", "dmy", "mdy", "epoch_seconds", "epoch_milliseconds")
 
 
-def timestamp(value, date_format, zone):
+def parse_datetime(value, date_format):
+    value = value.strip()
+    if date_format.startswith("epoch_"):
+        number = float(value)
+        return datetime.fromtimestamp(
+            number / (1000 if date_format.endswith("milliseconds") else 1), UTC
+        )
+    if date_format == "iso8601":
+        if not ("T" in value or " " in value) or ":" not in value:
+            raise ValueError("Timestamp requires date and time")
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    fmt = "%d/%m/%Y %H:%M:%S" if date_format == "dmy" else "%m/%d/%Y %H:%M:%S"
+    return datetime.strptime(value, fmt)
+
+
+def timestamp(value, date_format, zone=None):
     if not value or not value.strip():
         return None, "timestamp_missing"
     value = value.strip()
     try:
-        if date_format.startswith("epoch_"):
-            number = float(value)
-            parsed = datetime.fromtimestamp(
-                number / (1000 if date_format.endswith("milliseconds") else 1), UTC
-            )
-        elif date_format == "iso8601":
-            if not ("T" in value or " " in value) or ":" not in value:
-                raise ValueError("Timestamp requires date and time")
-            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-        else:
-            fmt = "%d/%m/%Y %H:%M:%S" if date_format == "dmy" else "%m/%d/%Y %H:%M:%S"
-            parsed = datetime.strptime(value, fmt)
+        parsed = parse_datetime(value, date_format)
         if parsed.tzinfo is None:
+            if zone is None:
+                return parsed.isoformat(), None
             timezone = ZoneInfo(zone)
             candidates = [parsed.replace(tzinfo=timezone, fold=fold) for fold in (0, 1)]
             valid = [
@@ -58,7 +64,7 @@ def timestamp(value, date_format, zone):
         return None, "timestamp_invalid"
 
 
-def normalize(row, mapping, date_format, zone):
+def normalize(row, mapping, date_format, zone=None):
     values = row["values"]
     normalized = {field: None for field in FIELDS}
     warnings = []

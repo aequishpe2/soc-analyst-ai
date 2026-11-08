@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic.json_schema import SkipJsonSchema
 from sqlalchemy import create_engine, func, select, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -23,7 +24,8 @@ from app.settings import Settings
 
 class CaseInput(BaseModel):
     title: str = Field(min_length=3, max_length=200)
-    timezone: str = Field(default="Europe/Stockholm", max_length=100)
+    # Hidden compatibility for old clients; never requested by the UI.
+    timezone: SkipJsonSchema[str | None] = Field(default=None, max_length=100, exclude=True)
 
     @field_validator("title")
     @classmethod
@@ -36,6 +38,8 @@ class CaseInput(BaseModel):
     @field_validator("timezone")
     @classmethod
     def known_timezone(cls, value: str) -> str:
+        if value is None:
+            return value
         try:
             ZoneInfo(value)
         except (ZoneInfoNotFoundError, ValueError) as exc:
@@ -137,7 +141,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.post("/api/v1/cases", response_model=CaseOutput, status_code=201)
     def create_case(payload: CaseInput, db: Annotated[Session, Depends(session)]):
-        case = Case(**payload.model_dump())
+        case = Case(title=payload.title, timezone=payload.timezone or "UTC")
         db.add(case)
         db.commit()
         db.refresh(case)

@@ -21,6 +21,7 @@ type Reference = {
   row: number;
   line_end: number;
   timestamp_utc: string | null;
+  timestamp?: string | null;
   normalized: Record<string, string | null>;
 };
 export function OriginalEvidence({
@@ -142,7 +143,7 @@ export default function FindingEvidence({
           <thead>
             <tr>
               <th>Fuente</th>
-              <th>Fecha UTC</th>
+              <th>Fecha y hora</th>
               <th>Usuario / origen</th>
               <th>Papel</th>
               <th>Original</th>
@@ -157,7 +158,7 @@ export default function FindingEvidence({
                   {r.sheet} · fila {r.row}
                   {r.line_end !== r.row ? `–${r.line_end}` : ""}
                 </td>
-                <td>{r.timestamp_utc ?? "Sin fecha válida"}</td>
+                <td>{r.timestamp ?? r.timestamp_utc ?? "Sin fecha válida"}</td>
                 <td>
                   {r.normalized.user ?? "—"}
                   <br />

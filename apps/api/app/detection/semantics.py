@@ -82,6 +82,8 @@ class Observation:
     conflict: bool
     users: set
     assets: set
+    clock: str
+    wall_time: datetime | None
 
 
 def interpret(row, config):
@@ -159,11 +161,19 @@ def interpret(row, config):
         if value
     }
     users = {v for v in (user, identifier(values.get("target_user"))) if v}
-    when = (
-        datetime.fromisoformat(row["timestamp_utc"].replace("Z", "+00:00"))
-        if row["timestamp_utc"]
-        else None
-    )
+    canonical = row.get("file_timestamp") or row["timestamp_utc"]
+    when = datetime.fromisoformat(canonical.replace("Z", "+00:00")) if canonical else None
+    clock = "absolute" if when and when.tzinfo else "file:" + row.get("import_id", "unscoped")
+    wall = row.get("wall_time")
+    if wall:
+        wall = datetime.fromisoformat(wall)
+    elif "wall_time" not in row:
+        try:
+            wall = datetime.fromisoformat(
+                (values.get("timestamp") or "").replace("Z", "+00:00")
+            ).replace(tzinfo=None)
+        except ValueError:
+            wall = None
     return Observation(
         row["id"],
         values,
@@ -177,6 +187,8 @@ def interpret(row, config):
         conflict,
         users,
         assets,
+        clock,
+        wall,
     )
 
 
@@ -184,6 +196,8 @@ def duplicate_fingerprint(row):
     return config_digest(
         {
             "timestamp_utc": row["timestamp_utc"],
+            "file_timestamp": row.get("file_timestamp"),
+            "clock_file": row.get("import_id", "unscoped") if row.get("file_timestamp") else None,
             "raw_invalid_time": row["normalized"].get("timestamp")
             if row["timestamp_utc"] is None
             else None,

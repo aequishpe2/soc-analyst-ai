@@ -48,3 +48,11 @@ No se midió el rendimiento máximo de 100 000 registros ni se probó esta fase 
 - Navegador: selección de alcance/calendario, ejecución, filtros Alto + éxito tras fallos, apertura del hallazgo y consulta del registro original de éxito con SHA-256 verificadas. Los datos de prueba y las capturas permanecen en .local, fuera de Git.
 
 Los cuatro grupos de demostración no se presentan como cuatro incidentes. No se realizaron análisis automáticos sobre los archivos del usuario. Siguen pendientes PostgreSQL/Compose, rendimiento máximo, fuentes SIEM adicionales, revisión humana auditable, gráficos avanzados, agente de IA e informe PDF. GitHub Actions está configurado, pero no se reporta una ejecución remota como aprobada sin haberla observado.
+
+## Simplificación de fechas del archivo
+
+Se eliminaron los controles y referencias de configuración horaria de casos, importación, calendarios, listas y detalles de configuración. No se solicita ese dato al cliente. Las configuraciones históricas se conservan internamente y no se muestran como opciones vigentes.
+
+Motor 1.1.0, reglas soc-local-2 y normalización 3: fechas con referencia explícita se interpretan automáticamente; las demás conservan su hora sin asignarles una ubicación. Las comparaciones entre archivos exigen referencias comparables; las horas no calificadas se comparan dentro de su importación. Los calendarios usan la hora registrada. Los análisis históricos no se sobrescriben ni se reejecutan bajo una versión distinta.
+
+112 pruebas aprobadas, incluyendo creación/importación/calendario sin el dato, ausencia del campo en los esquemas públicos y separación de relojes de archivos distintos. Compilación, tipos, formato y migración 0004 desde base vacía aprobados. Esta modificación no elimina ni cambia los archivos originales.

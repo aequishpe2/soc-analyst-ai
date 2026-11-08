@@ -6,7 +6,7 @@ from collections import Counter
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
 
-from app.detection.config import MAX_EVENTS, MAX_INPUT_BYTES, DetectionConfig
+from app.detection.config import ENGINE_VERSION, MAX_EVENTS, MAX_INPUT_BYTES, DetectionConfig
 from app.detection.engine import detect
 from app.fingerprints import digest_file
 from app.models import (
@@ -20,6 +20,7 @@ from app.models import (
     InvestigationGroup,
     SourceFile,
 )
+from app.normalization import parse_datetime, timestamp
 
 
 def execute_analysis(engine, storage, analysis_id):
@@ -28,6 +29,8 @@ def execute_analysis(engine, storage, analysis_id):
         analysis.status = "running"
         db.commit()
         try:
+            if analysis.config.get("engine_version") != ENGINE_VERSION:
+                raise ValueError("Este análisis usa una versión anterior. Crea un análisis nuevo.")
             config = DetectionConfig.model_validate(analysis.config["settings"])
             runs = db.scalars(
                 select(ImportRun)
@@ -70,6 +73,7 @@ def execute_analysis(engine, storage, analysis_id):
                     Event.sheet,
                     Event.row,
                     Event.timestamp_utc,
+                    Event.file_timestamp,
                     Event.normalized,
                 )
                 .where(Event.import_id.in_(ids))
@@ -77,6 +81,18 @@ def execute_analysis(engine, storage, analysis_id):
             )
             for event in db.execute(query).yield_per(500):
                 row = dict(event._mapping)
+                # Read the file's own clock, including legacy imports.
+                fmt = next(r.config["date_format"] for r in runs if r.id == row["import_id"])
+                raw_time = row["normalized"].get("timestamp")
+                canonical, _ = timestamp(raw_time, fmt)
+                parsed = parse_datetime(raw_time, fmt) if canonical else None
+                row["timestamp_utc"] = canonical if parsed and parsed.tzinfo else None
+                row["file_timestamp"] = canonical if parsed and parsed.tzinfo is None else None
+                row["wall_time"] = (
+                    parsed.replace(tzinfo=None).isoformat()
+                    if parsed and not fmt.startswith("epoch_")
+                    else None
+                )
                 encoded = json.dumps(row, sort_keys=True).encode()
                 size += len(encoded)
                 if size > MAX_INPUT_BYTES or len(rows) >= MAX_EVENTS:

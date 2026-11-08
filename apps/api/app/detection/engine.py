@@ -262,7 +262,7 @@ def detect(events, config):
         rows.append(row)
     rows.sort(key=lambda r: (r.timestamp.isoformat() if r.timestamp else "9999", r.id))
     # ISO strings with varying offsets/fractions must not be used for chronological ordering.
-    dated = sorted([r for r in rows if r.timestamp], key=lambda r: (r.timestamp, r.id))
+    dated = sorted([r for r in rows if r.timestamp], key=lambda r: (r.clock, r.timestamp, r.id))
     undated = [r for r in rows if not r.timestamp]
     rows = dated + undated
     by_id = {r.id: r for r in rows}
@@ -275,6 +275,13 @@ def detect(events, config):
             reason = eligible(rule, row)
             if rule == "outside_hours" and config.business_hours is None:
                 reason = "calendar_not_configured"
+            elif (
+                rule == "outside_hours"
+                and reason is None
+                and config.business_hours.timezone is None
+                and row.wall_time is None
+            ):
+                reason = "calendar_file_time_missing"
             if reason is None and rule == "privilege_change" and not privileged_target(row, config):
                 reason = "missing_privileged_target"
             if reason:
@@ -320,12 +327,15 @@ def detect(events, config):
                     "resultados parciales."
                 )
             ids = sorted(r.id for r in evidence)
-            fingerprint = config_digest({"rule": rule, "evidence": ids, "observed": observed})
+            fingerprint = config_digest(
+                {"rule": rule, "evidence": ids, "observed": observed, "clock": evidence[0].clock}
+            )
             dates = [r.timestamp for r in evidence if r.timestamp]
             findings.append(
                 {
                     "key": fingerprint,
                     "rule_id": rule,
+                    "clock_basis": evidence[0].clock,
                     "title": title,
                     "severity": severity,
                     "confidence": confidence,
@@ -353,11 +363,11 @@ def detect(events, config):
             grouped = defaultdict(list)
             for row in usable:
                 key = (
-                    (row.source, row.user, row.destination)
+                    (row.clock, row.source, row.user, row.destination)
                     if rule == "brute_force"
-                    else (row.source,)
+                    else (row.clock, row.source)
                     if rule == "password_spraying"
-                    else (row.source, row.user)
+                    else (row.clock, row.source, row.user)
                 )
                 grouped[key].append(row)
             window = (
@@ -412,7 +422,7 @@ def detect(events, config):
         elif rule == "success_after_failures":
             grouped = defaultdict(list)
             for row in usable:
-                grouped[(row.source, row.user, row.destination)].append(row)
+                grouped[(row.clock, row.source, row.user, row.destination)].append(row)
             for bucket in grouped.values():
                 failures = deque()
                 for row in sorted(
@@ -447,9 +457,13 @@ def detect(events, config):
         elif rule == "outside_hours" and config.business_hours:
             schedule = config.business_hours
             begin, end = time.fromisoformat(schedule.start), time.fromisoformat(schedule.end)
-            zone = ZoneInfo(schedule.timezone)
+            zone = ZoneInfo(schedule.timezone) if schedule.timezone else None
             for row in usable:
-                local = row.timestamp.astimezone(zone)
+                local = (
+                    (row.timestamp.astimezone(zone) if row.timestamp.tzinfo else row.timestamp)
+                    if zone
+                    else row.wall_time
+                )
                 if local.weekday() not in schedule.weekdays or not begin <= local.time() < end:
                     emit(
                         [row],
@@ -516,7 +530,7 @@ def detect(events, config):
                     windows and (row.values.get("provider_event_id") or "").strip() == "1102"
                 )
                 findings[-1]["attack_reference"] = "T1070" if cleared else "T1562"
-    findings.sort(key=lambda f: (f["start"] or "9999", f["rule_id"], f["key"]))
+    findings.sort(key=lambda f: (f["clock_basis"], f["start"] or "9999", f["rule_id"], f["key"]))
     if sum(f["evidence_count"] for f in findings) > 500_000:
         raise ValueError("Demasiadas referencias de evidencia. Reduce el alcance del análisis.")
     groups = correlate(findings, by_id, config.correlation_window)
@@ -573,14 +587,14 @@ def correlate(findings, observations, window):
             if event_id in last_event:
                 candidates[last_event[event_id]] = {"kind": "shared_event", "event_id": event_id}
             row = observations[event_id]
-            pairs.update((u, asset) for u in row.users for asset in row.assets)
+            pairs.update((row.clock, u, asset) for u in row.users for asset in row.assets)
         for pair in sorted(pairs):
             previous = last_pair.get(pair)
             if previous is not None and previous not in candidates:
                 candidates[previous] = {
                     "kind": "shared_user_asset",
-                    "user": pair[0],
-                    "asset": pair[1],
+                    "user": pair[1],
+                    "asset": pair[2],
                 }
         for previous, reason in sorted(candidates.items(), reverse=True):
             a, b = root(previous), root(index)

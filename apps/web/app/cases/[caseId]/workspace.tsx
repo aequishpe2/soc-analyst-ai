@@ -51,7 +51,7 @@ type Job = {
 type Run = {
   id: string;
   summary: Summary;
-  config: { timezone: string; date_format: string };
+  config: { date_format: string };
 };
 type EventRow = {
   id: string;
@@ -59,6 +59,7 @@ type EventRow = {
   row: number;
   line_end: number;
   timestamp_utc: string | null;
+  timestamp?: string | null;
   normalized: Record<string, string | null>;
   warnings: string[];
 };
@@ -67,7 +68,7 @@ type Evidence = EventRow & {
   sha256: string;
   columns: { id: string; label: string }[];
   original: (string | null)[];
-  import_config: { timezone: string; date_format: string };
+  import_config: { date_format: string };
 };
 type Issue = { sheet: string; row: number; line_end: number; reason: string };
 const fields = [
@@ -138,7 +139,6 @@ const clip = (text: string | null | undefined) =>
 export default function ImportWorkspace({ caseId }: { caseId: string }) {
   const [caseInfo, setCaseInfo] = useState<{
     title: string;
-    timezone: string;
   } | null>(null);
   const [files, setFiles] = useState<Source[]>([]);
   const [fileTotal, setFileTotal] = useState(0);
@@ -152,7 +152,6 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
   const [mappings, setMappings] = useState<
     Record<string, Record<string, string>>
   >({});
-  const [timezone, setTimezone] = useState("Europe/Stockholm");
   const [dateFormat, setDateFormat] = useState("iso8601");
   const [confirmed, setConfirmed] = useState(false);
   const [events, setEvents] = useState<EventRow[]>([]);
@@ -180,10 +179,9 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
   }, [caseId, fileOffset]);
 
   useEffect(() => {
-    api<{ title: string; timezone: string }>(`cases/${caseId}`)
+    api<{ title: string }>(`cases/${caseId}`)
       .then((data) => {
         setCaseInfo(data);
-        setTimezone(data.timezone);
       })
       .catch((e) => setError(e.message));
   }, [caseId]);
@@ -366,7 +364,6 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
             sheet,
             mapping: mappings[sheet],
           })),
-          timezone,
           date_format: dateFormat,
         }),
       });
@@ -704,27 +701,10 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
                           </option>
                         </select>
                       </div>
-                      <div>
-                        <label htmlFor="import-zone">
-                          Zona horaria del archivo
-                        </label>
-                        <input
-                          id="import-zone"
-                          value={timezone}
-                          disabled={working}
-                          onChange={(e) => {
-                            setTimezone(e.target.value);
-                            setConfirmed(false);
-                          }}
-                          required
-                          maxLength={100}
-                        />
-                      </div>
                     </div>
                     <p className="muted">
-                      La zona se aplica a fechas sin offset. Fechas ausentes,
-                      inválidas o ambiguas se conservarán con advertencias y sin
-                      hora UTC; no se podrán usar para correlación temporal.
+                      Se utilizan las fechas y horas del archivo. Las fechas
+                      inválidas se conservan con advertencias.
                     </p>
                     <label className="confirm">
                       <input
@@ -734,7 +714,7 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
                         onChange={(e) => setConfirmed(e.target.checked)}
                       />
                       Revisé el mapeo de las {selectedSheets.length} hojas
-                      seleccionadas, el formato de fecha y la zona horaria.
+                      seleccionadas y el formato de fecha.
                     </label>
                     {!validMappings && (
                       <p className="notice">
@@ -772,7 +752,7 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
             {runs.map((r, i) => (
               <option key={r.id} value={r.id}>
                 Versión {runs.length - i} · {r.summary.accepted} aceptados ·{" "}
-                {r.config.timezone} · {r.config.date_format}
+                {r.config.date_format}
               </option>
             ))}
           </select>
@@ -807,11 +787,11 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
           )}
           <div className="table-scroll">
             <table>
-              <caption>Eventos aceptados · fechas normalizadas a UTC</caption>
+              <caption>Eventos aceptados · fechas del archivo</caption>
               <thead>
                 <tr>
                   <th>Origen</th>
-                  <th>Fecha UTC</th>
+                  <th>Fecha y hora</th>
                   <th>Usuario</th>
                   <th>IP origen</th>
                   <th>Evento / resultado</th>
@@ -826,7 +806,9 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
                       {e.sheet} · fila {e.row}
                       {e.row !== e.line_end ? `–${e.line_end}` : ""}
                     </td>
-                    <td>{e.timestamp_utc ?? "Sin fecha válida"}</td>
+                    <td>
+                      {e.timestamp ?? e.timestamp_utc ?? "Sin fecha válida"}
+                    </td>
                     <td>{clip(e.normalized.user)}</td>
                     <td>{clip(e.normalized.source_ip)}</td>
                     <td>

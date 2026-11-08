@@ -7,6 +7,7 @@ import subprocess
 import sys
 import uuid
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 
 from sqlalchemy import insert, inspect, select
@@ -179,7 +180,7 @@ class LocalJobs:
                     counts["rejected"] += 1
                 else:
                     normalized, utc, row_warnings = normalize(
-                        row, mapping[row["sheet"]], config["date_format"], config["timezone"]
+                        row, mapping[row["sheet"]], config["date_format"], config.get("timezone")
                     )
                     fingerprint = config_digest({"values": row["values"]})
                     if fingerprint in seen:
@@ -197,7 +198,13 @@ class LocalJobs:
                             "sheet": row["sheet"],
                             "row": row["row"],
                             "line_end": row["line_end"],
-                            "timestamp_utc": utc,
+                            "timestamp_utc": utc
+                            if utc and datetime.fromisoformat(utc.replace("Z", "+00:00")).tzinfo
+                            else None,
+                            "file_timestamp": utc
+                            if utc
+                            and datetime.fromisoformat(utc.replace("Z", "+00:00")).tzinfo is None
+                            else None,
                             "normalized": normalized,
                             "original": row["values"],
                             "warnings": row_warnings,

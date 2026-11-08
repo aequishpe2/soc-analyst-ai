@@ -31,7 +31,7 @@ Fase 3: el motor puro está en apps/api/app/detection, separado de rutas y persi
 ```mermaid
 flowchart TD
     A[Cargar XLSX o CSV] --> B[Validar y conservar original con SHA-256]
-    B --> C[Elegir hojas, columnas y zona horaria]
+    B --> C[Elegir hojas, columnas y referencia temporal]
     C --> D[Normalizar eventos y registrar errores]
     D --> E[Reglas y correlación reproducibles]
     E --> F[Hallazgos con referencias a evidencias]
@@ -62,7 +62,7 @@ Las rutas HTTP delegan al dominio; las reglas no dependen del modelo de IA. El f
 
 Conservar archivo original, hash, hoja, número de fila y valores originales con acceso restringido. Nunca modificar el original para normalizarlo. Un evento normalizado apunta a una fila de origen y registra advertencias. Los duplicados se identifican sin borrar sus referencias.
 
-Guardar timestamp original, timestamp UTC, zona/offset elegido y calidad del parseo. No asumir la zona por estar el cliente en Estocolmo. Permitir Europe/Stockholm y tratar fechas ambiguas por horario de verano como errores a resolver. Eventos sin fecha válida quedan visibles pero fuera de correlaciones temporales; declarar esa limitación en el informe.
+Guardar la fecha original y su interpretación. Si la fuente incluye una referencia explícita, usarla automáticamente; si no, conservar su reloj sin asignarle una ubicación. Comparar horas sin referencia dentro del mismo archivo, no entre archivos distintos. La interfaz no solicita configuración horaria. Fechas inválidas permanecen visibles y fuera de correlaciones temporales.
 
 ## Seguridad y privacidad
 

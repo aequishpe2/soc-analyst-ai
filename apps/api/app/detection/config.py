@@ -4,9 +4,10 @@ from typing import Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic.json_schema import SkipJsonSchema
 
-ENGINE_VERSION = "1.0.1"
-RULESET_VERSION = "soc-local-1"
+ENGINE_VERSION = "1.1.0"
+RULESET_VERSION = "soc-local-2"
 MAX_EVENTS = 100_000
 MAX_INPUT_BYTES = 64 * 1024 * 1024
 MAX_FINDINGS = 5000
@@ -15,7 +16,7 @@ MAX_LINKS = 20_000
 
 class BusinessHours(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    timezone: str = Field(max_length=100)
+    timezone: SkipJsonSchema[str | None] = Field(default=None, max_length=100)
     weekdays: list[int] = Field(default=[0, 1, 2, 3, 4], min_length=1, max_length=7)
     start: str = Field(default="08:00", pattern=r"^\d{2}:\d{2}$")
     end: str = Field(default="18:00", pattern=r"^\d{2}:\d{2}$")
@@ -23,7 +24,8 @@ class BusinessHours(BaseModel):
     @model_validator(mode="after")
     def valid_schedule(self):
         try:
-            ZoneInfo(self.timezone)
+            if self.timezone:
+                ZoneInfo(self.timezone)
         except (ZoneInfoNotFoundError, ValueError) as exc:
             raise ValueError("Zona horaria IANA desconocida") from exc
         begin, end = time.fromisoformat(self.start), time.fromisoformat(self.end)

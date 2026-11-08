@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field, field_validator
+from pydantic.json_schema import SkipJsonSchema
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -24,12 +25,14 @@ class SheetMapping(BaseModel):
 
 class ImportInput(BaseModel):
     sheets: list[SheetMapping] = Field(min_length=1, max_length=20)
-    timezone: str = Field(max_length=100)
+    timezone: SkipJsonSchema[str | None] = Field(default=None, max_length=100)
     date_format: Literal["iso8601", "dmy", "mdy", "epoch_seconds", "epoch_milliseconds"]
 
     @field_validator("timezone")
     @classmethod
     def valid_zone(cls, value):
+        if value is None:
+            return value
         try:
             ZoneInfo(value)
         except (ZoneInfoNotFoundError, ValueError) as exc:
@@ -230,7 +233,7 @@ def router_for(engine, jobs, storage):
                 raise HTTPException(422, "Mapeo de hoja o columna inválido.")
             if len(set(sheet.mapping.values())) != len(sheet.mapping):
                 raise HTTPException(422, "No asignes una columna a varios campos.")
-        config = {**payload.model_dump(), "normalizer_version": "2", "parser_version": "1"}
+        config = {**payload.model_dump(), "normalizer_version": "3", "parser_version": "1"}
         config["sheets"] = sorted(config["sheets"], key=lambda s: s["sheet"])
         fingerprint = config_digest(config)
         for previous in db.scalars(
@@ -302,6 +305,9 @@ def router_for(engine, jobs, storage):
                     "row": r.row,
                     "line_end": r.line_end,
                     "timestamp_utc": r.timestamp_utc,
+                    "timestamp": r.normalized.get("timestamp")
+                    or r.file_timestamp
+                    or r.timestamp_utc,
                     "normalized": r.normalized,
                     "warnings": r.warnings,
                 }
@@ -333,6 +339,9 @@ def router_for(engine, jobs, storage):
             "original": record.original,
             "normalized": record.normalized,
             "timestamp_utc": record.timestamp_utc,
+            "timestamp": record.normalized.get("timestamp")
+            or record.file_timestamp
+            or record.timestamp_utc,
             "warnings": record.warnings,
             "import_config": run.config,
         }

@@ -2,7 +2,7 @@
 
 ## Uso
 
-Crear o abrir un caso, seleccionar **Abrir caso**, cargar un archivo y esperar su validación. Elegir las hojas e inspeccionar la muestra; asignar los campos normalizados a columnas y confirmar formato de fecha/zona antes de importar. Las sugerencias se basan únicamente en nombres de columnas y no se aplican sin confirmación.
+Crear o abrir un caso, seleccionar **Abrir caso**, cargar un archivo y esperar su validación. Elegir las hojas e inspeccionar la muestra; asignar los campos normalizados a columnas y confirmar el formato de fecha antes de importar. Las sugerencias se basan únicamente en nombres de columnas y no se aplican sin confirmación.
 
 La primera fila no vacía de cada hoja/CSV es la cabecera. Se admiten cabeceras repetidas o vacías mediante identificadores estables c0, c1, etc. Para archivos con títulos o banners antes de la tabla, preparar una copia con la cabecera correcta y conservar también la fuente del cliente. No editar el original desde esta aplicación.
 
@@ -26,11 +26,13 @@ CSV: UTF-8, UTF-16 con BOM y Windows-1252 (este último mediante selección expl
 
 XLSX: validación ZIP y XML con defusedxml, lectura read-only, dimensiones verificadas mediante las celdas reales. Rechazo de macros, contenido binario incrustado, cifrado, relaciones externas (incluidos hipervínculos externos) y entidades XML. No se ejecutan fórmulas ni se utilizan sus resultados cacheados. Una fórmula se conserva como texto, pero no se usa como campo normalizado. Las fechas tipadas por Excel se representan en ISO; el libro original conserva su representación exacta y sus estilos.
 
-## Tiempo y calidad
+## Fechas y horas del archivo
 
-Formatos explícitos: ISO 8601 (fecha y hora, con offset opcional), DD/MM/AAAA HH:mm:ss, MM/DD/AAAA HH:mm:ss y Unix en segundos/milisegundos. La zona IANA elegida solo se aplica a fechas sin offset.
+No se solicita configuración horaria. Las fechas con referencia explícita se interpretan automáticamente; las que no la incluyen conservan la hora registrada, sin asignarles una ubicación. Se admiten ISO 8601, DD/MM/AAAA HH:mm:ss, MM/DD/AAAA HH:mm:ss y Unix en segundos/milisegundos.
 
-Fechas inválidas, ausentes, ambiguas o inexistentes por horario de verano producen hora UTC null y advertencias. El evento se conserva; no debe entrar en correlaciones temporales. No se deduce la zona por la ubicación del cliente. Las IP inválidas se conservan con advertencia. Las filas idénticas se marcan como posibles duplicados y se conservan con sus referencias individuales.
+Las fechas inválidas o ausentes se conservan con advertencias. Las horas sin referencia se comparan dentro de la misma importación del archivo, sin mezclar automáticamente relojes de archivos distintos. Las hojas de un mismo libro pueden importarse juntas. Los datos históricos y sus resultados se conservan; una revisión nueva usa el comportamiento actual.
+
+Las IP inválidas se conservan con advertencia. Las filas idénticas se marcan como posibles duplicados y se conservan con sus referencias individuales.
 
 ## Trazabilidad y consistencia
 
@@ -52,6 +54,6 @@ Almacenamiento nativo: `.local/ingestion/`; Compose: volumen privado `ingestion_
 
 Carga multipart con `file`, `encoding` y `delimiter`: `POST /api/v1/cases/{case_id}/files` devuelve 202 con archivo y trabajo. `GET /jobs/{id}` devuelve queued/running/succeeded/failed. `POST /jobs/{id}/retry` reintenta un trabajo fallido.
 
-`GET /cases/{id}/files`, `GET /files/{id}/preview`, `GET /files/{id}/jobs` y `GET /files/{id}/imports` recuperan fuentes y su historial. `POST /files/{id}/imports` recibe hojas y mapeos, zona y formato de fecha; devuelve el trabajo. `GET /cases/{id}/events?import_id=...` y `GET /imports/{id}/issues` admiten offset/limit (máximo 100). `GET /cases/{id}/events/{event_id}` recupera la evidencia. Todas estas rutas están bajo `/api/v1`.
+`GET /cases/{id}/files`, `GET /files/{id}/preview`, `GET /files/{id}/jobs` y `GET /files/{id}/imports` recuperan fuentes y su historial. `POST /files/{id}/imports` recibe hojas y mapeos, formato de fecha; devuelve el trabajo. `GET /cases/{id}/events?import_id=...` y `GET /imports/{id}/issues` admiten offset/limit (máximo 100). `GET /cases/{id}/events/{event_id}` recupera la evidencia. Todas estas rutas están bajo `/api/v1`.
 
 Los endpoints comprueban existencia y pertenencia entre caso/importación/evento; eso no sustituye autorización por usuario, aún pendiente. El proxy de la interfaz admite solo rutas conocidas, valida el origen de las escrituras, limita los bytes reales de la carga y evita caché de los datos.

@@ -216,6 +216,12 @@ def router_for(engine, jobs):
         record = require(db, Analysis, analysis_id)
         if record.status != "failed":
             raise HTTPException(409, "Solo se reintentan análisis fallidos.")
+        if record.config.get("engine_version") != ENGINE_VERSION:
+            raise HTTPException(
+                409,
+                "Este análisis usa una versión anterior. "
+                "Crea un análisis nuevo con las importaciones existentes.",
+            )
         if jobs.queue.full():
             raise HTTPException(429, "La cola está llena.")
         record.status, record.error = "queued", None
@@ -288,11 +294,18 @@ def router_for(engine, jobs):
                     "row": event.row,
                     "line_end": event.line_end,
                     "timestamp_utc": event.timestamp_utc,
+                    "timestamp": event.normalized.get("timestamp")
+                    or event.file_timestamp
+                    or event.timestamp_utc,
                     "normalized": event.normalized,
                     "warnings": event.warnings,
                 }
                 for event, role, source in db.execute(
-                    query.order_by(Event.timestamp_utc, Event.id).offset(offset).limit(limit)
+                    query.order_by(
+                        func.coalesce(Event.file_timestamp, Event.timestamp_utc), Event.id
+                    )
+                    .offset(offset)
+                    .limit(limit)
                 )
             ],
             "total": db.scalar(select(func.count()).select_from(query.subquery())),

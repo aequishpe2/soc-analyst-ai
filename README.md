@@ -4,7 +4,7 @@ Aplicación web local en desarrollo para apoyar a analistas SOC Nivel 2 con regi
 
 ## Estado
 
-Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, ocho reglas deterministas, cobertura, filtros de hallazgos y grupos de investigación con evidencias trazables. Ollama/Qwen3 están preparados localmente. Siguen pendientes la revisión humana con cambios auditados, los gráficos del dashboard, el agente de IA y el PDF.
+Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, ocho reglas deterministas, cobertura, filtros de hallazgos y grupos de investigación con evidencias trazables. No se solicita configuración horaria: se utilizan las horas del archivo. Ollama/Qwen3 están preparados localmente. Siguen pendientes la revisión humana con cambios auditados, los gráficos del dashboard, el agente de IA y el PDF.
 
 En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://127.0.0.1:3000`. Usar `Detener-SOC.cmd` al terminar. Las herramientas y el modelo se instalan fuera del control de versiones; un clon nuevo requiere seguir la guía de arranque.
 

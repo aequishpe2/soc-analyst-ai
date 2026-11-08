@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { api } from "../../../../lib/api";
+import { api, displayDetails } from "../../../../lib/api";
 import FindingEvidence, { OriginalEvidence } from "./evidence";
 import {
   Analysis,
@@ -36,14 +36,13 @@ function stamp(value: string) {
     new Intl.DateTimeFormat("es", {
       dateStyle: "short",
       timeStyle: "short",
-      timeZone: "UTC",
     }).format(
       new Date(
         value.endsWith("Z") || /[+-]\d{2}:\d{2}$/.test(value)
           ? value
           : value + "Z",
       ),
-    ) + " UTC"
+    ) + ""
   );
 }
 
@@ -87,7 +86,6 @@ function CoverageTable({ rows }: { rows: Coverage[] }) {
 
 export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
   const [title, setTitle] = useState("Investigación");
-  const [caseZone, setCaseZone] = useState("Europe/Stockholm");
   const [imports, setImports] = useState<Scope[]>([]);
   const [importsLoading, setImportsLoading] = useState(true);
   const [importsError, setImportsError] = useState(false);
@@ -100,7 +98,6 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
   const [weekdays, setWeekdays] = useState([0, 1, 2, 3, 4]);
   const [start, setStart] = useState("08:00");
   const [end, setEnd] = useState("18:00");
-  const [calendarZone, setCalendarZone] = useState("Europe/Stockholm");
   const [excludedUsers, setExcludedUsers] = useState("");
   const [excludedIps, setExcludedIps] = useState("");
   const [privilegedGroups, setPrivilegedGroups] = useState("");
@@ -144,11 +141,9 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
     return data.items;
   }, [caseId, historyOffset]);
   useEffect(() => {
-    api<{ title: string; timezone: string }>(`cases/${caseId}`)
+    api<{ title: string }>(`cases/${caseId}`)
       .then((c) => {
         setTitle(c.title);
-        setCaseZone(c.timezone);
-        setCalendarZone(c.timezone);
       })
       .catch((e) => setError(e.message));
     api<{ defaults: Settings; rules: { id: string; title: string }[] }>(
@@ -326,9 +321,7 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
         excluded_users: lines(excludedUsers),
         excluded_source_ips: lines(excludedIps),
         privileged_groups: lines(privilegedGroups),
-        business_hours: calendar
-          ? { timezone: calendarZone, weekdays, start, end }
-          : null,
+        business_hours: calendar ? { weekdays, start, end } : null,
       };
       const data = await api<Analysis>(`cases/${caseId}/analyses`, {
         method: "POST",
@@ -425,7 +418,7 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                     <strong>{s.name}</strong>
                     <small>
                       {s.summary.accepted} eventos aceptados ·{" "}
-                      {stamp(s.created_at)} · {s.config.timezone}
+                      {stamp(s.created_at)}
                     </small>
                     <code>{s.id}</code>
                     {alternate && (
@@ -567,17 +560,6 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
               {calendar && (
                 <fieldset>
                   <legend>Horario autorizado (mismo día)</legend>
-                  <label htmlFor="calendar-zone">Zona IANA</label>
-                  <input
-                    id="calendar-zone"
-                    value={calendarZone}
-                    disabled={running}
-                    onChange={(e) => {
-                      setCalendarZone(e.target.value);
-                      setConfirmed(false);
-                    }}
-                    required
-                  />
                   <div className="mapping-grid">
                     <div>
                       <label htmlFor="business-start">Inicio incluido</label>
@@ -801,10 +783,10 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                 </p>
                 <p className="muted">
                   Motor {analysis.config.engine_version} · Reglas{" "}
-                  {analysis.config.ruleset_version} · Zona del caso {caseZone}
+                  {analysis.config.ruleset_version}
                 </p>
                 <pre className="observed-data">
-                  {JSON.stringify(analysis.config, null, 2)}
+                  {displayDetails(analysis.config)}
                 </pre>
                 <ul className="hash">
                   {analysis.summary.sources.map((s) => (
@@ -929,7 +911,7 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                             Condiciones observadas y coincidencias
                           </summary>
                           <pre className="observed-data">
-                            {JSON.stringify(f.observed, null, 2)}
+                            {displayDetails(f.observed)}
                           </pre>
                         </details>
                         <FindingEvidence

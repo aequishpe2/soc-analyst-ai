@@ -1,8 +1,8 @@
-# Motor de detección local · versión 1.0.1
+# Motor de detección local · versión 1.1.0
 
 ## Uso
 
-Abrir un caso y entrar en **Análisis de seguridad**. Seleccionar las importaciones ya revisadas: una revisión por archivo original, hasta 20 importaciones y 100 000 eventos en total. Confirmar el perfil de fuente, umbrales, exclusiones y calendario opcional. Ejecutar y revisar hallazgos, cobertura y evidencias.
+Abrir un caso y entrar en **Análisis de seguridad**. Seleccionar las importaciones ya revisadas: una revisión por archivo original, hasta 20 importaciones y 100 000 eventos en total. Confirmar el perfil de fuente, umbrales, exclusiones y calendario opcional. No se solicita configuración horaria: se usan las horas del archivo. Ejecutar y revisar hallazgos, cobertura y evidencias.
 
 Los controles preparan un análisis nuevo. Los resultados del historial conservan su configuración, hashes y evidencias; modificar un formulario no modifica un resultado histórico. Una solicitud idéntica reutiliza el análisis previo. Un análisis fallido puede reintentarse explícitamente. Los resultados se publican únicamente al terminar la transacción completa.
 
@@ -12,13 +12,13 @@ El motor no usa IA, no consulta inteligencia externa, no ejecuta comandos y no r
 
 | Regla | Condición predeterminada | Severidad | Datos necesarios |
 | --- | --- | --- | --- |
-| Fallos repetidos | Al menos 10 fallos en una ventana inclusiva de 300 s, mismo origen, usuario y destino disponible | Medio | Autenticación fallida reconocida, usuario, origen válido, UTC |
-| Posible spraying | Al menos 10 usuarios distintos con fallos desde un origen en 600 s | Alto | Autenticación fallida reconocida, usuarios, origen, UTC |
-| Éxito después de fallos | Al menos 5 fallos estrictamente anteriores al éxito en 600 s, mismo origen, usuario y destino disponible | Alto | Autenticación y resultado reconocidos, usuario, origen, UTC |
-| Fuera de horario | Acceso exitoso fuera del calendario confirmado | Bajo | Éxito reconocido, usuario, UTC y calendario configurado |
+| Fallos repetidos | Al menos 10 fallos en una ventana inclusiva de 300 s, mismo origen, usuario y destino disponible | Medio | Autenticación fallida reconocida, usuario, origen válido, fecha válida |
+| Posible spraying | Al menos 10 usuarios distintos con fallos desde un origen en 600 s | Alto | Autenticación fallida reconocida, usuarios, origen, fecha válida |
+| Éxito después de fallos | Al menos 5 fallos estrictamente anteriores al éxito en 600 s, mismo origen, usuario y destino disponible | Alto | Autenticación y resultado reconocidos, usuario, origen, fecha válida |
+| Fuera de horario | Acceso exitoso fuera del calendario confirmado | Bajo | Éxito reconocido, usuario, fecha y calendario configurado |
 | Cambio de privilegios | Asignación/adición explícita, con grupo o privilegio privilegiado identificado | Medio | Acción reconocida y target_group o privilege explícito |
 | Comando/proceso sospechoso | Coincidencia con patrones concretos de argumentos o nombre de herramienta | Medio | Campo command o process |
-| Accesos remotos múltiples | Al menos 3 destinos distintos desde un origen para un usuario en 600 s | Alto | Autenticación remota exitosa reconocida, usuario, origen y destino distintos, UTC |
+| Accesos remotos múltiples | Al menos 3 destinos distintos desde un origen para un usuario en 600 s | Alto | Autenticación remota exitosa reconocida, usuario, origen y destino distintos, fecha válida |
 | Alteración de controles | Tipo explícito de desactivación/borrado o Windows Security 1102 | Alto | Semántica reconocida; no se infiere de ausencia de logs |
 
 Los umbrales y ventanas se configuran y quedan versionados. Un origen puede ser IP válida o equipo de origen explícito; un destino puede ser equipo o IP válida. No se asume que una columna ambigua llamada Host represente el origen: revisar el mapeo. Sin destino, los fallos y éxitos se agrupan por usuario/origen; no se puede atribuir con certeza el servicio afectado.
@@ -46,7 +46,7 @@ Para códigos Windows se exige el proveedor mapeado `Microsoft-Windows-Security-
 - 1102: borrado del registro de seguridad.
 - 4672 y 4719 se reconocen sin usarlos como prueba de escalamiento o de desactivación: privilegios especiales al iniciar sesión y cambio de política no demuestran esas conclusiones por sí solos.
 
-Grupos privilegiados: nombres exactos configurados (comparación sin distinguir mayúsculas), SID S-1-5-32-544 y SID de dominio con RID 512/518/519. El nombre parcial Non-Administrators no coincide con Administrators. Para privilege, se admiten los roles explícitos root, administrator, admin, system o sudo; no se considera que una cuenta llamada root demuestre una elevación. La nueva normalización versión 2 admite proveedor, tipo de logon, grupo, cuenta afectada y privilegio. Importaciones anteriores pueden requerir una nueva revisión de mapeo para aportar estos campos.
+Grupos privilegiados: nombres exactos configurados (comparación sin distinguir mayúsculas), SID S-1-5-32-544 y SID de dominio con RID 512/518/519. El nombre parcial Non-Administrators no coincide con Administrators. Para privilege, se admiten los roles explícitos root, administrator, admin, system o sudo; no se considera que una cuenta llamada root demuestre una elevación. La nueva normalización versión 3 admite proveedor, tipo de logon, grupo, cuenta afectada y privilegio. Importaciones anteriores pueden requerir una nueva revisión de mapeo para aportar estos campos.
 
 ## Patrones de comandos
 
@@ -66,13 +66,15 @@ No se aplican listas de cuentas administrativas legítimas automáticamente. Las
 
 ## Duplicados y correlación
 
-No se admite combinar dos revisiones/lecturas del mismo hash original. Entre archivos distintos, registros con todos los campos normalizados equivalentes y la misma hora UTC se cuentan una vez para no inflar umbrales. Se conserva cada registro original y se puede consultar la relación copia/representante. Sin hora UTC se incluye la fecha cruda en la comparación. La política puede subcontar eventos legítimos indistinguibles cuando faltan identificadores o precisión temporal; exportaciones parcialmente distintas también pueden ocultar duplicados no identificables.
+No se admite combinar dos revisiones/lecturas del mismo hash original. Entre archivos distintos, registros con todos los campos normalizados equivalentes y la misma referencia temporal comparable se cuentan una vez para no inflar umbrales. Se conserva cada registro original y se puede consultar la relación copia/representante. Las horas sin referencia solo se deduplican dentro de su importación, y las fechas inválidas conservan el valor crudo para comparar. La política puede subcontar eventos legítimos indistinguibles cuando faltan identificadores o precisión temporal; exportaciones parcialmente distintas también pueden ocultar duplicados no identificables.
 
 La correlación produce un bosque de vínculos verificables: evidencia compartida, o usuario y activo coincidentes. Una IP sola no une hallazgos. Los vínculos por entidad deben respetar un intervalo global de hasta 1800 s, configurable, evitando cadenas ilimitadas. Los vínculos por el mismo evento pueden conectar secuencias largas que comparten esa evidencia. Los grupos no son incidentes confirmados ni necesariamente una partición correcta de incidentes reales.
 
 ## Persistencia y límites
 
 Un análisis guarda alcance, configuración, reglas/motor e input_hash SHA-256 de entradas, configuración y procedencia. Las fuentes originales se verifican antes de ejecutar. Las importaciones son instantáneas y los resultados históricos no se sobrescriben. Se persisten resultados y estado completado en una sola transacción; un fallo revierte grupos, hallazgos y evidencias. Al reiniciar, los análisis pendientes se marcan interrumpidos y pueden reintentarse.
+
+Las fechas sin referencia no se convierten inventando una ubicación: sus ventanas y relaciones temporales se limitan al reloj del archivo. Las fechas con referencia explícita sí permiten correlación entre archivos. El calendario se aplica a la hora registrada; para valores Unix sin hora local explícita, esa regla queda no evaluable. Los análisis históricos permanecen intactos; no se reejecutan con criterios nuevos bajo una versión antigua.
 
 Límites: 100 000 eventos, 20 importaciones, 64 MiB de entrada normalizada serializada, 5000 hallazgos y 500 000 referencias. Los excesos fallan explícitamente sin resultados parciales. Comparte la cola local de la importación y requiere una sola instancia de API; el cálculo corre fuera del bucle HTTP. No hay sandbox ni límite de RAM/tiempo de SO para el cálculo analítico. PostgreSQL/Compose y rendimiento máximo siguen pendientes de validación. Autenticación y autorización multiusuario continúan pendientes: mantener localhost.
 

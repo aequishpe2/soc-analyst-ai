@@ -24,8 +24,9 @@ export const warningLabels: Record<string, string> = {
     "Sin fecha asignada: no se podrá correlacionar por tiempo.",
   timestamp_invalid: "Fecha no válida para el formato seleccionado.",
   timestamp_dst_ambiguous:
-    "Hora ambigua por cambio de horario: requiere un offset explícito.",
-  timestamp_dst_nonexistent: "Hora inexistente por cambio de horario.",
+    "Fecha pendiente de revisión en una importación anterior.",
+  timestamp_dst_nonexistent:
+    "Fecha pendiente de revisión en una importación anterior.",
   formula_present: "Se conserva una fórmula como texto; no se ejecutó.",
   duplicate_preserved: "Fila idéntica a otra: se conserva su evidencia.",
 };
@@ -35,4 +36,20 @@ export function warningLabel(value: string) {
   if (value.startsWith("invalid_ip:"))
     return "Una IP no tiene un formato válido; se conserva el original.";
   return warningLabels[value] ?? value;
+}
+
+// Historical configurations remain intact in storage; obsolete controls are not shown.
+export function displayDetails(value: unknown): string {
+  const clean = (item: unknown): unknown => {
+    if (Array.isArray(item)) return item.map(clean);
+    if (item && typeof item === "object") {
+      return Object.fromEntries(
+        Object.entries(item)
+          .filter(([key]) => key !== "timezone")
+          .map(([key, v]) => [key, clean(v)]),
+      );
+    }
+    return item;
+  };
+  return JSON.stringify(clean(value), null, 2);
 }

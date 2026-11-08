@@ -12,9 +12,9 @@ Aceptación: servicios saludables; migración reproducible sobre base vacía; CI
 
 ## 2. Importación y evidencia
 
-Implementar casos, CSV/XLSX, vista previa, mapeo, zona horaria y registro de errores. Crear fixtures exclusivamente sintéticos.
+Implementar casos, CSV/XLSX, vista previa, mapeo, fechas automáticas y registro de errores. Crear fixtures exclusivamente sintéticos.
 
-Aceptación: una fila mostrada conserva referencia verificable al archivo/hoja/fila y hash del original; fechas ambiguas requieren resolución; conteos de aceptadas/rechazadas cuadran; probar CSV con comillas/saltos, múltiples hojas, archivos corruptos, límites, fórmulas y contenido hostil; importaciones fallidas no parecen completas.
+Aceptación: una fila mostrada conserva referencia verificable al archivo/hoja/fila y hash del original; horas sin referencia no reciben una ubicación inventada; conteos de aceptadas/rechazadas cuadran; probar CSV con comillas/saltos, múltiples hojas, archivos corruptos, límites, fórmulas y contenido hostil; importaciones fallidas no parecen completas.
 
 ## 3. Motor analítico
 

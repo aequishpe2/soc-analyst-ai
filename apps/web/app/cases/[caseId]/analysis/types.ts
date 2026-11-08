@@ -4,7 +4,7 @@ export type Scope = {
   name: string;
   sha256: string;
   summary: { accepted: number; rejected: number };
-  config: { timezone: string };
+  config: { date_format?: string };
   created_at: string;
 };
 export type Coverage = {
@@ -56,7 +56,6 @@ export type Settings = {
   lateral_window: number;
   correlation_window: number;
   business_hours: {
-    timezone: string;
     weekdays: number[];
     start: string;
     end: string;
@@ -111,10 +110,12 @@ export const reasonLabels: Record<string, string> = {
   unknown_outcome: "Resultado no reconocido",
   conflicting_semantics: "Tipo, resultado o código contradictorios",
   remote_type_not_established: "No se establece que el acceso sea remoto",
-  missing_valid_timestamp: "Sin fecha UTC válida",
+  missing_valid_timestamp: "Sin fecha válida",
   missing_user: "Sin usuario válido",
   missing_valid_source: "Sin IP o equipo de origen válido",
   missing_distinct_destination: "Sin destino distinto del origen",
+  calendar_file_time_missing:
+    "No se dispone de una hora local explícita en el archivo",
   calendar_not_configured: "Calendario no configurado",
   missing_privileged_target:
     "Sin grupo o privilegio privilegiado identificable",
