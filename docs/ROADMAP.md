@@ -2,7 +2,7 @@
 
 Las fases están ordenadas por dependencias. Ninguna funcionalidad se considera entregada solo por tener una pantalla.
 
-Estado actual: base local, importación y motor determinista implementados y verificados con SQLite y datos sintéticos. Pendientes Compose/PostgreSQL, validación de rendimiento máximo y worker distribuido. Ver INGESTION.md, DETECTION.md y VERIFICATION.md. La siguiente fase es ampliar el dashboard y la revisión humana auditable.
+Estado actual: base local, importación, motor determinista y asistente IA local por hallazgo implementados y verificados con SQLite y datos sintéticos. La IA usa composición restringida; ver AI.md. Pendientes Compose/PostgreSQL, validación de rendimiento máximo, worker distribuido y evaluación de utilidad SOC. La siguiente fase es ampliar el dashboard y la revisión humana auditable, seguida del informe global y PDF.
 
 ## 1. Base ejecutable
 

@@ -56,3 +56,14 @@ Se eliminaron los controles y referencias de configuración horaria de casos, im
 Motor 1.1.0, reglas soc-local-2 y normalización 3: fechas con referencia explícita se interpretan automáticamente; las demás conservan su hora sin asignarles una ubicación. Las comparaciones entre archivos exigen referencias comparables; las horas no calificadas se comparan dentro de su importación. Los calendarios usan la hora registrada. Los análisis históricos no se sobrescriben ni se reejecutan bajo una versión distinta.
 
 112 pruebas aprobadas, incluyendo creación/importación/calendario sin el dato, ausencia del campo en los esquemas públicos y separación de relojes de archivos distintos. Compilación, tipos, formato y migración 0004 desde base vacía aprobados. Esta modificación no elimina ni cambia los archivos originales.
+
+## Asistente IA local por hallazgo
+
+Implementación de composición restringida `grounded-outline-1`, persistencia separada en `ai_drafts` y migración 0005. Qwen3 selecciona y organiza contenido permitido; la API compone el borrador sin aceptar afirmaciones nuevas. El resultado determinista no cambia.
+
+- **133 pruebas aprobadas**: 112 existentes y 21 nuevas sobre IA. Se comprueban ciclo de vida, idempotencia, privacidad, aislamiento de instrucciones en celdas, pertenencia de evidencias, integridad de archivos, proveedor caído y reintentos, cambio de modelo, roles de evidencia, afirmaciones adicionales con referencias válidas, respuesta malformada, tamaño, tokens truncados, tiempo y contexto máximos, cola llena y reinicio.
+- Ruff, formato Python, TypeScript, compilación de producción y Prettier aprobados. Migraciones hasta 0005 sobre SQLite vacío y `alembic check` aprobados. Sin dependencias nuevas.
+- Prueba real mediante proxy web/API/Ollama en el caso sintético: borrador de asignación de privilegios completado en **34,58 segundos**, 396 tokens de entrada y 57 de salida reportados por Ollama. Modelo `qwen3:8b`, digest `500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41`. Se verificaron severidad, contenido permitido y hash de una evidencia original. Es una prueba funcional, no un benchmark de calidad SOC.
+- Navegador: generación real del borrador de éxito tras fallos y apertura de su evidencia de acceso exitoso (fila 12) con SHA-256. Captura `.local/ai-draft-verified.png` y comprobación técnica `.local/ai-workflow-smoke.json`, excluidas de Git.
+
+No se generaron borradores automáticamente sobre datos reales del usuario. Siguen pendientes evaluación con casos SOC revisados, aprobación humana auditable, consultas autónomas del agente, dashboard gráfico, informe global y PDF. La prueba local no acredita una ejecución remota de GitHub Actions.

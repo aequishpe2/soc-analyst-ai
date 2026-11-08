@@ -1,6 +1,6 @@
 # Desarrollo local
 
-Esta fase permite crear/listar casos, importar Excel/CSV y ejecutar reglas de seguridad con evidencias y cobertura. No utiliza el agente de IA ni genera informes todavía. Consultar [la guía de importación](INGESTION.md) y [el motor de detección](DETECTION.md). No tiene autenticación: usar exclusivamente en un equipo de confianza, con puertos ligados a loopback; no publicar ni compartir por túneles.
+Esta fase permite crear/listar casos, importar Excel/CSV y ejecutar reglas de seguridad con evidencias y cobertura. Incluye borradores por hallazgo con IA local; el informe global y PDF siguen pendientes. Consulta [la guía de IA](AI.md). Consultar [la guía de importación](INGESTION.md) y [el motor de detección](DETECTION.md). No tiene autenticación: usar exclusivamente en un equipo de confianza, con puertos ligados a loopback; no publicar ni compartir por túneles.
 
 ## Este equipo: inicio directo en Windows
 
@@ -95,7 +95,7 @@ Crear un caso, abrirlo y cargar un archivo sintético. Revisar la vista previa, 
 
 Desde un caso, entrar en Análisis de seguridad, seleccionar revisiones y confirmar el contexto. Sin un calendario configurado, la regla de horario queda No evaluable. Si no hay campos de grupo/rol o tipo de acceso remoto, la cobertura debe indicar esas limitaciones; volver a importar con el mapeo apropiado si existen esas columnas en la fuente. No elegir Windows Security para códigos numéricos de otros proveedores.
 
-La cola es local y admite una sola instancia de API; Celery/Redis, revisión humana auditable, gráficos, agente de IA, PDF y OIDC están pendientes. No hay validación de despliegue compartido. Los tags de imágenes se fijan por versión principal o release; antes de producción se deberán fijar también digests y revisar su procedencia. La IA local reduce transmisión externa; no sustituye cifrado, control de acceso o seguridad del equipo.
+La cola es local y admite una sola instancia de API; Celery/Redis, revisión humana auditable, gráficos, consultas autónomas del agente, PDF y OIDC están pendientes. No hay validación de despliegue compartido. Los tags de imágenes se fijan por versión principal o release; antes de producción se deberán fijar también digests y revisar su procedencia. La IA local reduce transmisión externa; no sustituye cifrado, control de acceso o seguridad del equipo.
 
 Fuentes: [Ollama: desactivar cloud](https://docs.ollama.com/faq), [Next.js: instalación](https://nextjs.org/docs/app/getting-started/installation).
 

@@ -6,7 +6,7 @@ Abrir un caso y entrar en **Análisis de seguridad**. Seleccionar las importacio
 
 Los controles preparan un análisis nuevo. Los resultados del historial conservan su configuración, hashes y evidencias; modificar un formulario no modifica un resultado histórico. Una solicitud idéntica reutiliza el análisis previo. Un análisis fallido puede reintentarse explícitamente. Los resultados se publican únicamente al terminar la transacción completa.
 
-El motor no usa IA, no consulta inteligencia externa, no ejecuta comandos y no realiza contención. La integración analítica de Qwen3 y la revisión humana con cambios auditados siguen pendientes.
+El motor no usa IA, no consulta inteligencia externa, no ejecuta comandos y no realiza contención. Después del análisis, el [asistente local Qwen3](AI.md) puede preparar borradores por hallazgo sin modificar las detecciones. La revisión humana con cambios auditados sigue pendiente.
 
 ## Reglas iniciales
 

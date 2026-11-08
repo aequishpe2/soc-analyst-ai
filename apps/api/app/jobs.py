@@ -13,18 +13,20 @@ from pathlib import Path
 from sqlalchemy import insert, inspect, select
 from sqlalchemy.orm import Session
 
+from app.ai import execute_draft
 from app.detection.service import execute_analysis
 from app.fingerprints import config_digest, digest_file
-from app.models import Analysis, Event, ImportRun, Job, RowIssue, SourceFile
+from app.models import AIDraft, Analysis, Event, ImportRun, Job, RowIssue, SourceFile
 from app.normalization import normalize
 
 
 class LocalJobs:
-    def __init__(self, engine, storage):
+    def __init__(self, engine, storage, ai_provider=None):
         self.engine = engine
         self.storage = storage.resolve()
         self.queue = asyncio.Queue(maxsize=8)
         self.task = None
+        self.ai_provider = ai_provider
 
     async def start(self):
         # Do not pretend interrupted jobs completed. User can explicitly retry them.
@@ -45,6 +47,13 @@ class LocalJobs:
                 ):
                     analysis.status = "failed"
                     analysis.error = "Análisis interrumpido al reiniciar. Puedes reintentarlo."
+            if inspect(self.engine).has_table("ai_drafts"):
+                for draft in db.scalars(
+                    select(AIDraft).where(AIDraft.status.in_(["queued", "running"]))
+                ):
+                    draft.status = "failed"
+                    draft.result = None
+                    draft.error = "Borrador interrumpido al reiniciar. Puedes reintentarlo."
             db.commit()
         self.task = asyncio.create_task(self.consume())
 
@@ -70,6 +79,9 @@ class LocalJobs:
                 self.queue.task_done()
 
     def execute(self, job_id):
+        if job_id.startswith("draft:"):
+            execute_draft(self.engine, self.storage, job_id.split(":", 1)[1], self.ai_provider)
+            return
         if job_id.startswith("analysis:"):
             execute_analysis(self.engine, self.storage, job_id.split(":", 1)[1])
             return

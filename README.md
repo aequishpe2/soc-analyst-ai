@@ -4,7 +4,7 @@ Aplicación web local en desarrollo para apoyar a analistas SOC Nivel 2 con regi
 
 ## Estado
 
-Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, ocho reglas deterministas, cobertura, filtros de hallazgos y grupos de investigación con evidencias trazables. No se solicita configuración horaria: se utilizan las horas del archivo. Ollama/Qwen3 están preparados localmente. Siguen pendientes la revisión humana con cambios auditados, los gráficos del dashboard, el agente de IA y el PDF.
+Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, ocho reglas deterministas, cobertura, filtros y grupos de investigación con evidencias trazables. El asistente local Ollama/Qwen3:8b prepara borradores por hallazgo con explicación, evidencias y plan de acción a partir de contenido validado. No se solicita configuración horaria: se utilizan las horas del archivo. Siguen pendientes la revisión humana con cambios auditados, los gráficos del dashboard, las consultas autónomas del agente y el informe global con PDF.
 
 En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://127.0.0.1:3000`. Usar `Detener-SOC.cmd` al terminar. Las herramientas y el modelo se instalan fuera del control de versiones; un clon nuevo requiere seguir la guía de arranque.
 
@@ -13,6 +13,7 @@ En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://
 - [Arranque local y verificaciones](docs/LOCAL_SETUP.md)
 - [Importación: uso, límites y garantías](docs/INGESTION.md)
 - [Detección y correlación: reglas, alcance y límites](docs/DETECTION.md)
+- [IA local: uso, privacidad, validación y límites](docs/AI.md)
 - [Arquitectura y decisiones técnicas](docs/ARCHITECTURE.md)
 - [Contrato analítico, modelo de datos y API](docs/ANALYSIS_SPEC.md)
 - [Plan de desarrollo y criterios de aceptación](docs/ROADMAP.md)

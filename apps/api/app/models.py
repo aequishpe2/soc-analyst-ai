@@ -142,3 +142,19 @@ class AnalysisDuplicate(Base):
     analysis_id: Mapped[str] = mapped_column(ForeignKey("analyses.id"), primary_key=True)
     event_id: Mapped[str] = mapped_column(ForeignKey("events.id"), primary_key=True)
     representative_id: Mapped[str] = mapped_column(ForeignKey("events.id"))
+
+
+class AIDraft(Base):
+    __tablename__ = "ai_drafts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    finding_id: Mapped[str] = mapped_column(ForeignKey("findings.id"), unique=True)
+    status: Mapped[str] = mapped_column(String(20), default="queued")
+    model: Mapped[str] = mapped_column(String(100))
+    model_digest: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    version: Mapped[str] = mapped_column(String(30))
+    input_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    error: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )

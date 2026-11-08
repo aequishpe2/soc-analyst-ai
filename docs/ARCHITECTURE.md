@@ -17,7 +17,7 @@ Una aplicación para investigar archivos SIEM de un cliente por caso, con eviden
 | Archivos | Volumen privado local; adaptador de almacenamiento futuro | Originales y PDF fuera del directorio público |
 | Importación | CSV estándar y openpyxl con defusedxml | Lectura controlada de archivos; sin ejecutar fórmulas |
 | PDF | ReportLab con plantilla versionada | Documento reproducible generado desde datos validados |
-| IA | Ollama local con Qwen3-8B; herramientas de agente pendientes | Sin proveedor cloud ni fallback externo; diagnóstico disponible sin inferencia |
+| IA | Ollama local con Qwen3:8b y composición restringida por hallazgo | Contenido validado, citas y planes; herramientas autónomas del agente pendientes |
 | Entorno | Docker Compose | Servicios reproducibles para desarrollo local |
 
 Fijar versiones soportadas y lockfiles al implementar; revisar avisos de seguridad antes de instalarlas. Redis no será la fuente de verdad. Las tareas serán idempotentes, con estado persistente, límites y reintentos acotados.
@@ -75,6 +75,8 @@ Guardar la fecha original y su interpretación. Si la fuente incluye una referen
 - Purga configurable de archivos, eventos, informes y datos derivados, considerando respaldos. Auditoría de importaciones, análisis, revisiones, exportaciones y borrados, sin incluir contenido sensible.
 
 ## Agente y modelo de IA
+
+Implementado: `apps/api/app/ai.py`, rutas de borradores, trabajo persistente y componente de interfaz por hallazgo. Usa composición restringida mediante identificadores y un catálogo de contenido derivado del motor; no acepta afirmaciones de texto libre. Ver [contrato, uso y límites](AI.md). Las herramientas autónomas descritas a continuación son arquitectura futura.
 
 El agente coordina herramientas de lectura con alcance al caso: consultar eventos filtrados, obtener agregados y recuperar evidencias. Sin shell, navegación arbitraria, llamadas de red libres ni herramientas de contención. Presupuestos configurables de tiempo, tokens, herramientas y costo; límite de eventos por consulta.
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { api, displayDetails } from "../../../../lib/api";
 import FindingEvidence, { OriginalEvidence } from "./evidence";
+import AIDraft from "./ai-draft";
 import {
   Analysis,
   Coverage,
@@ -372,8 +373,8 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
       </section>
       <p className="info-note">
         Los hallazgos son indicios que requieren revisión. Un grupo de
-        investigación no equivale a un incidente confirmado. Esta fase no
-        utiliza IA ni ejecuta acciones en los equipos.
+        investigación no equivale a un incidente confirmado. Puedes preparar
+        borradores con IA local al investigar cada hallazgo.
       </p>
       {error && (
         <p role="alert" className="error">
@@ -916,6 +917,11 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                         </details>
                         <FindingEvidence
                           key={f.id}
+                          caseId={caseId}
+                          analysisId={analysis.id}
+                          findingId={f.id}
+                        />
+                        <AIDraft
                           caseId={caseId}
                           analysisId={analysis.id}
                           findingId={f.id}

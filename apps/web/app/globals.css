@@ -858,6 +858,25 @@ table small {
 .analysis-main .secondary:hover {
   background: #19312e;
 }
+.ai-draft {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #305c59;
+  border-radius: 8px;
+  background: #101f27;
+}
+.ai-review {
+  color: #efda8b;
+  font-weight: 600;
+}
+.ai-citations li {
+  margin: 8px 0;
+}
+.ai-trace dd {
+  margin: 4px 0 14px;
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
 @media (max-width: 1000px) {
   .analysis-setup {
     grid-template-columns: 1fr;

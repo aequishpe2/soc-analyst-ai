@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 const uuid =
   "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
 const reads = new RegExp(
-  `^v1/(?:system|detection/rules|cases|cases/${uuid}|cases/${uuid}/(?:files|events|imports|analyses)|cases/${uuid}/events/${uuid}|files/${uuid}/(?:preview|jobs|imports)|jobs/${uuid}|imports/${uuid}/issues|analyses/${uuid}|analyses/${uuid}/(?:findings|groups|duplicates)|analyses/${uuid}/findings/${uuid}/evidence)$`,
+  `^v1/(?:system|detection/rules|cases|cases/${uuid}|cases/${uuid}/(?:files|events|imports|analyses)|cases/${uuid}/events/${uuid}|files/${uuid}/(?:preview|jobs|imports)|jobs/${uuid}|imports/${uuid}/issues|analyses/${uuid}|analyses/${uuid}/(?:findings|groups|duplicates)|analyses/${uuid}/findings/${uuid}/(?:evidence|draft))$`,
 );
 const writes = new RegExp(
-  `^v1/(?:cases|cases/${uuid}/(?:files|analyses)|files/${uuid}/imports|jobs/${uuid}/retry|analyses/${uuid}/retry)$`,
+  `^v1/(?:cases|cases/${uuid}/(?:files|analyses)|files/${uuid}/imports|jobs/${uuid}/retry|analyses/${uuid}/retry|analyses/${uuid}/findings/${uuid}/draft)$`,
 );
 const uploadPath = new RegExp(`^v1/cases/${uuid}/files$`);
 

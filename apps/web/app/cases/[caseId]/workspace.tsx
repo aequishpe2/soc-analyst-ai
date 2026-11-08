@@ -421,7 +421,8 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
       </section>
       <p className="info-note">
         Importa y revisa los eventos antes de evaluar las versiones desde
-        Análisis de seguridad. Los registros no se envían a la IA en esta fase.
+        Análisis de seguridad. Desde cada hallazgo puedes preparar un borrador
+        con IA local.
       </p>
       {error && (
         <p role="alert" className="error">
