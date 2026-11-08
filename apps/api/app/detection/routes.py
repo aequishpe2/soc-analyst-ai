@@ -1,5 +1,5 @@
 import uuid
-from typing import Annotated, Literal
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.detection.config import ENGINE_VERSION, MAX_EVENTS, RULESET_VERSION, DetectionConfig
+from app.detection.dashboard import FindingFilters, aggregate
 from app.detection.engine import RULES
 from app.detection.semantics import (
     AUTH,
@@ -64,6 +65,7 @@ def router_for(engine, jobs):
             yield db
 
     DB = Annotated[Session, Depends(session)]
+    Filters = Annotated[FindingFilters, Depends()]
 
     def require(db, model, identifier):
         row = db.get(model, str(identifier))
@@ -233,25 +235,12 @@ def router_for(engine, jobs):
     def findings(
         analysis_id: uuid.UUID,
         db: DB,
-        severity: Literal["Crítico", "Alto", "Medio", "Bajo"] | None = None,
-        rule_id: str | None = Query(None, max_length=50),
-        group_id: uuid.UUID | None = None,
+        filters: Filters,
         offset: int = Query(0, ge=0),
         limit: int = Query(20, ge=1, le=100),
     ):
         completed(db, analysis_id)
-        query = select(Finding).where(Finding.analysis_id == str(analysis_id))
-        if severity:
-            query = query.where(Finding.severity == severity)
-        if rule_id:
-            if rule_id not in RULES:
-                raise HTTPException(422, "Regla desconocida.")
-            query = query.where(Finding.rule_id == rule_id)
-        if group_id:
-            group = require(db, InvestigationGroup, group_id)
-            if group.analysis_id != str(analysis_id):
-                raise HTTPException(404, "Grupo ajeno al análisis.")
-            query = query.where(Finding.group_id == str(group_id))
+        query = filters.query(db, analysis_id)
         return {
             "items": [
                 finding_output(f)
@@ -261,6 +250,11 @@ def router_for(engine, jobs):
             ],
             "total": db.scalar(select(func.count()).select_from(query.subquery())),
         }
+
+    @router.get("/analyses/{analysis_id}/dashboard")
+    def dashboard(analysis_id: uuid.UUID, db: DB, filters: Filters):
+        completed(db, analysis_id)
+        return aggregate(db, filters.query(db, analysis_id))
 
     @router.get("/analyses/{analysis_id}/findings/{finding_id}/evidence")
     def evidence(

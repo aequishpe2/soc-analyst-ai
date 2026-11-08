@@ -877,6 +877,231 @@ table small {
   font-family: monospace;
   overflow-wrap: anywhere;
 }
+.dashboard-filter-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.dashboard-link {
+  color: var(--accent);
+  font-weight: 600;
+}
+#dashboard {
+  scroll-margin-top: 24px;
+}
+.dashboard-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 22px 0;
+}
+.dashboard-stats > div {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d151e;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dashboard-stats span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.dashboard-stats strong {
+  font-size: 30px;
+}
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.dashboard-chart {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d151e;
+  min-width: 0;
+}
+.dashboard-chart h4 {
+  margin: 0 0 18px;
+  font-size: 15px;
+}
+.dashboard-timeline {
+  grid-column: 1 / -1;
+}
+.severity-chart {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 22px;
+  min-height: 290px;
+}
+.risk-donut {
+  height: 170px;
+  width: 170px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.risk-donut > div {
+  width: 126px;
+  height: 126px;
+  border-radius: 50%;
+  background: #0d151e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.risk-donut strong {
+  font-size: 36px;
+}
+.risk-donut span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.risk-legend,
+.dashboard-bars {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.risk-legend {
+  flex: 1;
+  min-width: 130px;
+  max-width: 230px;
+}
+.risk-legend button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  border-radius: 5px;
+}
+.risk-legend strong {
+  margin-left: auto;
+}
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.dashboard-bars button {
+  display: block;
+  width: 100%;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 7px 8px;
+  text-align: left;
+}
+.bar-caption {
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.bar-caption > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bar-track {
+  display: block;
+  height: 5px;
+  background: #1c2c38;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 7px;
+}
+.bar-track > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+.dashboard button[aria-pressed="true"] {
+  background: #19312e;
+  border-color: #4ea58b;
+}
+.dashboard button:hover {
+  background: #152a31;
+}
+.timeline-scroll {
+  overflow-x: auto;
+}
+.timeline-bars {
+  display: flex;
+  gap: 12px;
+  min-height: 170px;
+  align-items: end;
+}
+.timeline-bars button {
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  min-width: 105px;
+  font-size: 11px;
+}
+.timeline-column {
+  display: flex;
+  height: 95px;
+  width: 38px;
+  align-items: end;
+}
+.timeline-column > span {
+  display: block;
+  width: 100%;
+  background: #6aafeb;
+  border-radius: 4px 4px 0 0;
+}
+.dashboard-coverage {
+  margin: 24px 0;
+}
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+@media (max-width: 800px) {
+  .dashboard-filter-form,
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .dashboard-filter-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-chart {
+    padding: 16px;
+  }
+}
 @media (max-width: 1000px) {
   .analysis-setup {
     grid-template-columns: 1fr;

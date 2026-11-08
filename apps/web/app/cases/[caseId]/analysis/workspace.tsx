@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { api, displayDetails } from "../../../../lib/api";
 import FindingEvidence, { OriginalEvidence } from "./evidence";
 import AIDraft from "./ai-draft";
+import Dashboard from "./dashboard";
 import {
   Analysis,
   Coverage,
@@ -26,6 +27,7 @@ const thresholds: [keyof Settings, string, number, number][] = [
   ["lateral_window", "Ventana accesos remotos (segundos)", 30, 3600],
   ["correlation_window", "Ventana de correlación (segundos)", 30, 3600],
 ];
+const emptyFilters = { date_from: "", date_to: "", user: "", host: "" };
 function lines(value: string) {
   return value
     .split("\n")
@@ -115,6 +117,8 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
   const [severity, setSeverity] = useState("");
   const [rule, setRule] = useState("");
   const [groupId, setGroupId] = useState("");
+  const [filters, setFilters] = useState(emptyFilters);
+  const [draftFilters, setDraftFilters] = useState(emptyFilters);
   const [findings, setFindings] = useState<Finding[]>([]);
   const [findingsLoading, setFindingsLoading] = useState(true);
   const [findingsError, setFindingsError] = useState("");
@@ -209,6 +213,8 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
     setGroupId("");
     setSeverity("");
     setRule("");
+    setFilters(emptyFilters);
+    setDraftFilters(emptyFilters);
     setFindingOffset(0);
     setGroupOffset(0);
     setDuplicateOffset(0);
@@ -238,6 +244,20 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analysisId, pollTick]);
   const completed = analysis?.status === "succeeded" ? analysis.id : null;
+  const filterParams = new URLSearchParams();
+  if (severity) filterParams.set("severity", severity);
+  if (rule) filterParams.set("rule_id", rule);
+  if (groupId) filterParams.set("group_id", groupId);
+  for (const [key, value] of Object.entries(filters)) {
+    if (value) filterParams.set(key, value);
+  }
+  const filterQuery = filterParams.toString();
+  function applyFilters(patch: Partial<typeof emptyFilters>) {
+    const next = { ...filters, ...patch };
+    setFilters(next);
+    setDraftFilters(next);
+    setFindingOffset(0);
+  }
   useEffect(() => {
     if (!completed) return;
     let ignore = false;
@@ -245,10 +265,8 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
     setFindingsError("");
     setFindings([]);
     setActiveFinding("");
-    const query = new URLSearchParams({ offset: String(findingOffset) });
-    if (severity) query.set("severity", severity);
-    if (rule) query.set("rule_id", rule);
-    if (groupId) query.set("group_id", groupId);
+    const query = new URLSearchParams(filterQuery);
+    query.set("offset", String(findingOffset));
     api<{ items: Finding[]; total: number }>(
       `analyses/${completed}/findings?${query}`,
     )
@@ -270,7 +288,7 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
     return () => {
       ignore = true;
     };
-  }, [completed, severity, rule, groupId, findingOffset]);
+  }, [completed, filterQuery, findingOffset]);
   useEffect(() => {
     if (!completed) return;
     let ignore = false;
@@ -359,6 +377,11 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
     <main className="import-main analysis-main">
       <header>
         <Link href={`/cases/${caseId}`}>← Archivos y eventos del caso</Link>
+        {completed && (
+          <a className="dashboard-link" href="#dashboard">
+            Ver dashboard ↓
+          </a>
+        )}
         <span className="badge">MOTOR LOCAL · REGLAS</span>
       </header>
       <section className="heading">
@@ -751,6 +774,7 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
           {analysis.summary && (
             <>
               <p className="muted">{analysis.summary.limitations}</p>
+              <p className="muted">Totales del análisis completo</p>
               <div className="import-stats">
                 {Object.entries(analysis.summary.by_severity).map(([s, n]) => (
                   <div key={s}>
@@ -798,9 +822,9 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                   ))}
                 </ul>
               </details>
-              <h3>Cobertura del análisis</h3>
-              <CoverageTable rows={analysis.summary.coverage} />
-              <h3>Hallazgos sustentados</h3>
+              <h3 id="dashboard" tabIndex={-1}>
+                Dashboard interactivo
+              </h3>
               <div className="finding-filters">
                 <div>
                   <label htmlFor="severity-filter">Criticidad</label>
@@ -848,6 +872,133 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                   </button>
                 )}
               </div>
+              <form
+                className="dashboard-filter-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  applyFilters({
+                    ...draftFilters,
+                    user: draftFilters.user.trim(),
+                    host: draftFilters.host.trim(),
+                  });
+                }}
+              >
+                <div>
+                  <label htmlFor="dashboard-from">
+                    Desde · inicio del hallazgo
+                  </label>
+                  <input
+                    id="dashboard-from"
+                    type="date"
+                    value={draftFilters.date_from}
+                    max={draftFilters.date_to || undefined}
+                    onChange={(e) =>
+                      setDraftFilters({
+                        ...draftFilters,
+                        date_from: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <label htmlFor="dashboard-to">Hasta · inclusive</label>
+                  <input
+                    id="dashboard-to"
+                    type="date"
+                    value={draftFilters.date_to}
+                    min={draftFilters.date_from || undefined}
+                    onChange={(e) =>
+                      setDraftFilters({
+                        ...draftFilters,
+                        date_to: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <label htmlFor="dashboard-user">Usuario exacto</label>
+                  <input
+                    id="dashboard-user"
+                    value={draftFilters.user}
+                    maxLength={256}
+                    onChange={(e) =>
+                      setDraftFilters({ ...draftFilters, user: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label htmlFor="dashboard-host">Equipo exacto</label>
+                  <input
+                    id="dashboard-host"
+                    value={draftFilters.host}
+                    maxLength={256}
+                    onChange={(e) =>
+                      setDraftFilters({ ...draftFilters, host: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="dashboard-filter-actions">
+                  <button type="submit">Aplicar filtros</button>
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => {
+                      setSeverity("");
+                      setRule("");
+                      setGroupId("");
+                      applyFilters(emptyFilters);
+                    }}
+                  >
+                    Restablecer filtros
+                  </button>
+                </div>
+              </form>
+              <p className="muted">
+                Filtros aplicados:{" "}
+                {[
+                  severity,
+                  rule
+                    ? (catalog.find((r) => r.id === rule)?.title ?? rule)
+                    : "",
+                  groupId ? "Grupo seleccionado" : "",
+                  filters.date_from ? `Desde ${filters.date_from}` : "",
+                  filters.date_to ? `Hasta ${filters.date_to}` : "",
+                  filters.user ? `Usuario: ${filters.user}` : "",
+                  filters.host ? `Equipo: ${filters.host}` : "",
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "Todos los hallazgos"}
+                .
+              </p>
+              <Dashboard
+                analysisId={analysis.id}
+                query={filterQuery}
+                severity={severity}
+                rule={rule}
+                user={filters.user}
+                host={filters.host}
+                day={
+                  filters.date_from === filters.date_to ? filters.date_from : ""
+                }
+                onSeverity={(value) => {
+                  setSeverity(value);
+                  setFindingOffset(0);
+                }}
+                onRule={(value) => {
+                  setRule(value);
+                  setFindingOffset(0);
+                }}
+                onUser={(value) => applyFilters({ user: value })}
+                onHost={(value) => applyFilters({ host: value })}
+                onDay={(value) =>
+                  applyFilters({ date_from: value, date_to: value })
+                }
+              />
+              <details className="dashboard-coverage">
+                <summary>Cobertura del análisis completo</summary>
+                <CoverageTable rows={analysis.summary.coverage} />
+              </details>
+              <h3>Hallazgos sustentados · vista filtrada</h3>
               {findingsLoading && <p role="status">Recuperando hallazgos…</p>}
               {findingsError && (
                 <p role="alert" className="error">
@@ -948,7 +1099,7 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                   Siguientes
                 </button>
               </div>
-              <h3>Correlación · grupos de investigación</h3>
+              <h3>Correlación · grupos del análisis completo</h3>
               <p className="muted">
                 No es un conteo de incidentes. Las relaciones por entidad
                 requieren usuario y activo coincidentes; una IP sola no une

@@ -67,3 +67,13 @@ Implementación de composición restringida `grounded-outline-1`, persistencia s
 - Navegador: generación real del borrador de éxito tras fallos y apertura de su evidencia de acceso exitoso (fila 12) con SHA-256. Captura `.local/ai-draft-verified.png` y comprobación técnica `.local/ai-workflow-smoke.json`, excluidas de Git.
 
 No se generaron borradores automáticamente sobre datos reales del usuario. Siguen pendientes evaluación con casos SOC revisados, aprobación humana auditable, consultas autónomas del agente, dashboard gráfico, informe global y PDF. La prueba local no acredita una ejecución remota de GitHub Actions.
+
+## Dashboard interactivo
+
+Dashboard con criticidad, reglas, distribución diaria por fecha de inicio y principales usuarios/equipos. El backend comparte filtros entre gráficos y lista y agrega sobre todo el análisis, independientemente de la paginación. Sin dependencias ni migraciones nuevas.
+
+- **153 pruebas aprobadas**: 133 existentes y veinte nuevas. Verifican coherencia entre agregados y lista, filtros combinados, fechas inclusivas, hallazgos sin fecha, páginas adicionales, referencias compartidas sin duplicar eventos, entidades deduplicadas por hallazgo, coincidencia de usuario/equipo en el mismo evento, entradas inválidas, grupos ajenos y análisis incompletos.
+- Ruff, formato Python, tipos, compilación de producción y Prettier aprobados.
+- Navegador sobre el caso sintético: vista inicial de siete hallazgos, 27 registros de evidencia únicos y tres grupos; filtro Alto a cuatro hallazgos; combinación con regla de éxito tras fallos, día, usuario y equipo a un hallazgo y once evidencias. Estado sin coincidencias y restablecimiento comprobados. Captura `.local/dashboard-verified.png`, excluida de Git.
+
+Los siete hallazgos corresponden a la ejecución de demostración seleccionada, sin calendario; la ejecución histórica con calendario conserva sus ocho hallazgos. No se modifican resultados para completar los gráficos. La prueba visual se realizó en escritorio; el diseño incluye reglas adaptables, pero esta entrega no acredita una verificación visual móvil. Rendimiento máximo, PostgreSQL, revisión humana auditable e informe global/PDF siguen pendientes.

@@ -95,7 +95,7 @@ Crear un caso, abrirlo y cargar un archivo sintético. Revisar la vista previa, 
 
 Desde un caso, entrar en Análisis de seguridad, seleccionar revisiones y confirmar el contexto. Sin un calendario configurado, la regla de horario queda No evaluable. Si no hay campos de grupo/rol o tipo de acceso remoto, la cobertura debe indicar esas limitaciones; volver a importar con el mapeo apropiado si existen esas columnas en la fuente. No elegir Windows Security para códigos numéricos de otros proveedores.
 
-La cola es local y admite una sola instancia de API; Celery/Redis, revisión humana auditable, gráficos, consultas autónomas del agente, PDF y OIDC están pendientes. No hay validación de despliegue compartido. Los tags de imágenes se fijan por versión principal o release; antes de producción se deberán fijar también digests y revisar su procedencia. La IA local reduce transmisión externa; no sustituye cifrado, control de acceso o seguridad del equipo.
+La cola es local y admite una sola instancia de API; Celery/Redis, revisión humana auditable, consultas autónomas del agente, PDF y OIDC están pendientes. El dashboard interactivo está descrito en [DASHBOARD.md](DASHBOARD.md). No hay validación de despliegue compartido. Los tags de imágenes se fijan por versión principal o release; antes de producción se deberán fijar también digests y revisar su procedencia. La IA local reduce transmisión externa; no sustituye cifrado, control de acceso o seguridad del equipo.
 
 Fuentes: [Ollama: desactivar cloud](https://docs.ollama.com/faq), [Next.js: instalación](https://nextjs.org/docs/app/getting-started/installation).
 

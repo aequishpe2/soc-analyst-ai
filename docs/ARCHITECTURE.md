@@ -26,6 +26,8 @@ Implementación intermedia de fase 2: la instalación nativa usa cola local con 
 
 Fase 3: el motor puro está en apps/api/app/detection, separado de rutas y persistencia. Analiza importaciones explícitas y conserva configuración, hashes, cobertura, grupos y referencias en tablas separadas. El trabajo comparte la cola local y corre fuera del bucle HTTP; la IA no participa en las detecciones actuales.
 
+Dashboard: `apps/api/app/detection/dashboard.py` comparte los filtros con la lista de hallazgos y calcula agregados en la base de datos. La interfaz ofrece selección por gráficos, periodo y entidades; ver [alcance y conteos](DASHBOARD.md). La aprobación humana con historial sigue pendiente.
+
 ## Flujo
 
 ```mermaid
