@@ -52,6 +52,12 @@ Almacenamiento nativo: `.local/ingestion/`; Compose: volumen privado `ingestion_
 
 ## API implementada
 
+Las sugerencias de columnas se calculan en `app/mapping.py` y se entregan en `mapping_suggestions` junto a la vista previa. Admiten separadores y variantes habituales como `Process_CommandLine`. Una columna `Destination` se propone como IP o nombre de equipo según los valores no vacíos de la muestra; si se mezclan ambas clases, se deja sin asignar para revisión. La muestra no acredita el tipo de todas las filas. `Hostname`, `Log_Source` y `Event_Description` no se convierten automáticamente en origen, proveedor o tipo canónico: su significado puede ser distinto.
+
+El análisis puede sugerir revisar el perfil Windows Security si identifica un proveedor explícito o una combinación conocida de canal, ID y descripción en la muestra. Un código numérico solo no basta. El perfil requiere confirmación del analista y no modifica importaciones existentes. Las nuevas lecturas crean revisiones separadas y conservan el original.
+
+Referencias de las combinaciones conocidas: [eventos de autenticación de Windows](https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625) y [catálogo de eventos de Microsoft](https://learn.microsoft.com/en-au/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor). La sugerencia ayuda a revisar el formato; no certifica la procedencia del archivo.
+
 Carga multipart con `file`, `encoding` y `delimiter`: `POST /api/v1/cases/{case_id}/files` devuelve 202 con archivo y trabajo. `GET /jobs/{id}` devuelve queued/running/succeeded/failed. `POST /jobs/{id}/retry` reintenta un trabajo fallido.
 
 `GET /cases/{id}/files`, `GET /files/{id}/preview`, `GET /files/{id}/jobs` y `GET /files/{id}/imports` recuperan fuentes y su historial. `POST /files/{id}/imports` recibe hojas y mapeos, formato de fecha; devuelve el trabajo. `GET /cases/{id}/events?import_id=...` y `GET /imports/{id}/issues` admiten offset/limit (máximo 100). `GET /cases/{id}/events/{event_id}` recupera la evidencia. Todas estas rutas están bajo `/api/v1`.

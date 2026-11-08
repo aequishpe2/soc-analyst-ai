@@ -32,6 +32,7 @@ type Source = {
   sha256: string;
   size: number;
   status: string;
+  mapping_suggestions?: { sheet: string; mapping: Record<string, string> }[];
   manifest?: {
     sheets: Sheet[];
     total_rows: number;
@@ -89,50 +90,6 @@ const fields = [
   ["target_user", "Cuenta afectada o miembro añadido"],
   ["privilege", "Privilegio o rol asignado"],
 ];
-const aliases: Record<string, string[]> = {
-  timestamp: [
-    "timestamp",
-    "fecha",
-    "date",
-    "datetime",
-    "time",
-    "fecha_hora",
-    "@timestamp",
-  ],
-  user: ["user", "usuario", "username", "account"],
-  source_ip: ["source_ip", "src_ip", "ip_origen"],
-  destination_ip: ["destination_ip", "dst_ip", "ip_destino"],
-  source_host: ["source_host", "src_host"],
-  destination_host: ["destination_host", "dst_host"],
-  event_type: ["event_type", "evento", "event"],
-  result: ["result", "resultado", "outcome", "status"],
-  process: ["process", "proceso", "process_name"],
-  command: ["command", "comando", "commandline", "command_line"],
-  provider_event_id: ["event_id", "eventid"],
-  event_provider: ["provider", "providername", "event_provider"],
-  logon_type: ["logon_type", "logontype"],
-  target_group: ["target_group", "targetgroup", "groupname", "targetgroupname"],
-  target_user: ["target_user", "targetusername", "membername"],
-  privilege: ["privilege", "privileges", "role"],
-};
-function suggest(sheet: Sheet) {
-  const mapping: Record<string, string> = {};
-  const used = new Set<string>();
-  for (const [field] of fields) {
-    const col = sheet.columns.find(
-      (c) =>
-        !used.has(c.id) &&
-        aliases[field]?.includes(
-          c.label.toLowerCase().trim().replaceAll(" ", "_"),
-        ),
-    );
-    if (col) {
-      mapping[field] = col.id;
-      used.add(col.id);
-    }
-  }
-  return mapping;
-}
 const clip = (text: string | null | undefined) =>
   text ? text.slice(0, 180) + (text.length > 180 ? "…" : "") : "—";
 
@@ -216,7 +173,15 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
       const sheets = file.manifest?.sheets ?? [];
       setActiveSheet(sheets[0]?.name ?? "");
       setSelectedSheets(sheets.filter((s) => s.rows > 0).map((s) => s.name));
-      setMappings(Object.fromEntries(sheets.map((s) => [s.name, suggest(s)])));
+      setMappings(
+        Object.fromEntries(
+          sheets.map((s) => [
+            s.name,
+            file.mapping_suggestions?.find((m) => m.sheet === s.name)
+              ?.mapping ?? {},
+          ]),
+        ),
+      );
       setJob(
         jobs[0] && ["queued", "running", "failed"].includes(jobs[0].status)
           ? jobs[0]

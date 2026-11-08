@@ -536,6 +536,27 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
           {settings && (
             <form onSubmit={submit}>
               <label htmlFor="source-profile">Semántica de los registros</label>
+              {settings.source_profile === "generic" &&
+                selected.some((s) => s.profile_hint === "windows_security") && (
+                  <div className="info-note">
+                    <p>
+                      La muestra del archivo contiene un canal, códigos y
+                      descripciones compatibles con Windows Security. Confirma
+                      el proveedor antes de interpretar esos códigos.
+                    </p>
+                    <button
+                      type="button"
+                      className="secondary"
+                      disabled={running}
+                      onClick={() => {
+                        changeSetting("source_profile", "windows_security");
+                        setWindowsConfirmed(false);
+                      }}
+                    >
+                      Revisar con perfil Windows Security
+                    </button>
+                  </div>
+                )}
               <select
                 id="source-profile"
                 disabled={running}
@@ -774,7 +795,41 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
           {analysis.summary && (
             <>
               <p className="muted">{analysis.summary.limitations}</p>
+              {analysis.summary.coverage.every(
+                (r) => r.eligible_events === 0,
+              ) && (
+                <div className="error" role="alert">
+                  <strong>
+                    No se pudo evaluar la seguridad de los registros.
+                  </strong>
+                  <p>
+                    Se importaron {analysis.summary.input_events} eventos, pero
+                    ninguna regla tuvo datos interpretables. Cero hallazgos no
+                    significa que el archivo esté libre de amenazas.
+                  </p>
+                  <p>
+                    Revisa el mapeo de tipo de evento, ID y proveedor, comandos
+                    y destinos. Si los códigos corresponden a Windows Security,
+                    selecciona ese perfil al analizar.
+                  </p>
+                  <Link href={`/cases/${caseId}`}>
+                    Revisar las columnas del archivo →
+                  </Link>
+                </div>
+              )}
               <p className="muted">Totales del análisis completo</p>
+              {analysis.summary.coverage.some(
+                (r) => r.status === "partial" || r.status === "not_evaluable",
+              ) &&
+                analysis.summary.coverage.some(
+                  (r) => r.eligible_events > 0,
+                ) && (
+                  <p className="info-note">
+                    La cobertura es parcial. Consulta las reglas no evaluables y
+                    sus motivos; pueden faltar campos, semántica del proveedor o
+                    contexto del cliente.
+                  </p>
+                )}
               <div className="import-stats">
                 {Object.entries(analysis.summary.by_severity).map(([s, n]) => (
                   <div key={s}>
@@ -994,7 +1049,14 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                   applyFilters({ date_from: value, date_to: value })
                 }
               />
-              <details className="dashboard-coverage">
+              <details
+                className="dashboard-coverage"
+                open={
+                  analysis.summary.coverage.every(
+                    (r) => r.eligible_events === 0,
+                  ) || undefined
+                }
+              >
                 <summary>Cobertura del análisis completo</summary>
                 <CoverageTable rows={analysis.summary.coverage} />
               </details>

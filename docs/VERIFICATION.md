@@ -77,3 +77,11 @@ Dashboard con criticidad, reglas, distribución diaria por fecha de inicio y pri
 - Navegador sobre el caso sintético: vista inicial de siete hallazgos, 27 registros de evidencia únicos y tres grupos; filtro Alto a cuatro hallazgos; combinación con regla de éxito tras fallos, día, usuario y equipo a un hallazgo y once evidencias. Estado sin coincidencias y restablecimiento comprobados. Captura `.local/dashboard-verified.png`, excluida de Git.
 
 Los siete hallazgos corresponden a la ejecución de demostración seleccionada, sin calendario; la ejecución histórica con calendario conserva sus ocho hallazgos. No se modifican resultados para completar los gráficos. La prueba visual se realizó en escritorio; el diseño incluye reglas adaptables, pero esta entrega no acredita una verificación visual móvil. Rendimiento máximo, PostgreSQL, revisión humana auditable e informe global/PDF siguen pendientes.
+
+## Formatos nuevos y análisis no evaluables
+
+Se centralizaron las sugerencias de encabezados en la API y se agregó reconocimiento de `Process_CommandLine`, clasificación revisable de `Destination` y sugerencia de perfil basada en proveedor o combinación de canal/ID/descripción. No se deduce una técnica de texto descriptivo arbitrario ni un proveedor por su ID numérico solo.
+
+**160 pruebas aprobadas**, incluyendo siete pruebas nuevas. La regresión reproduce un export Windows sintético: trece filas, importación incompleta con cero hallazgos y cero reglas evaluables, nueva revisión con mapeo completo y perfil explícito con cuatro hallazgos respaldados. Se verifica que el original y los resultados históricos no cambien; códigos solos, instrucciones en descripciones, fórmulas, columnas ambiguas y destinos mixtos no activan inferencias automáticas.
+
+El dashboard ahora distingue actividad importada, cero coincidencias y ausencia de reglas evaluables. Los cambios también se comprobaron en una revisión local del archivo señalado por el usuario; sus datos y resultados permanecen fuera de Git. Compilación, tipos, Ruff y formato aprobados. No se alteraron reglas ni umbrales para incrementar hallazgos.

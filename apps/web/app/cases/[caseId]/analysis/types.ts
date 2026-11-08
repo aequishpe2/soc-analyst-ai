@@ -5,6 +5,7 @@ export type Scope = {
   sha256: string;
   summary: { accepted: number; rejected: number };
   config: { date_format?: string };
+  profile_hint?: string | null;
   created_at: string;
 };
 export type Coverage = {

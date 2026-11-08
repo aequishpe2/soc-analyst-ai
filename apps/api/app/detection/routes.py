@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.detection.config import ENGINE_VERSION, MAX_EVENTS, RULESET_VERSION, DetectionConfig
-from app.detection.dashboard import FindingFilters, aggregate
+from app.detection.dashboard import FindingFilters, aggregate, input_activity
 from app.detection.engine import RULES
 from app.detection.semantics import (
     AUTH,
@@ -21,6 +21,7 @@ from app.detection.semantics import (
     SUCCESS_TYPES,
 )
 from app.fingerprints import config_digest
+from app.mapping import profile_hint
 from app.models import (
     Analysis,
     AnalysisDuplicate,
@@ -118,6 +119,7 @@ def router_for(engine, jobs):
                 "sha256": source.sha256,
                 "summary": run.summary,
                 "config": run.config,
+                "profile_hint": profile_hint(source.manifest),
                 "created_at": run.created_at,
             }
             for run, source in db.execute(
@@ -253,8 +255,11 @@ def router_for(engine, jobs):
 
     @router.get("/analyses/{analysis_id}/dashboard")
     def dashboard(analysis_id: uuid.UUID, db: DB, filters: Filters):
-        completed(db, analysis_id)
-        return aggregate(db, filters.query(db, analysis_id))
+        analysis = completed(db, analysis_id)
+        return {
+            **aggregate(db, filters.query(db, analysis_id)),
+            "input_activity": input_activity(db, analysis),
+        }
 
     @router.get("/analyses/{analysis_id}/findings/{finding_id}/evidence")
     def evidence(

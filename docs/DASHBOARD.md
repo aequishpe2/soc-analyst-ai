@@ -4,6 +4,8 @@ Disponible dentro de un análisis completado. Usar **Ver dashboard** en la cabec
 
 ## Visualizaciones
 
+Antes de las alertas se muestran los datos de entrada del análisis completo: registros importados, usuarios registrados, registros con comando mapeado, reglas con eventos evaluables y hasta ocho IDs de evento con sus conteos. Son descripciones de los datos, no alertas. Permanecen visibles aunque el análisis no tenga hallazgos y no cambian con los filtros de hallazgos.
+
 - Distribución por criticidad: gráfico circular y leyenda con conteos; cada categoría filtra la vista.
 - Hallazgos por regla: barras seleccionables para las ocho reglas disponibles.
 - Distribución diaria por fecha de inicio del hallazgo: cada día permite consultar sus hallazgos. No representa causalidad ni movimiento entre archivos. Sin fecha válida, el hallazgo se cuenta por separado.
@@ -27,5 +29,7 @@ El formulario aplica periodo y entidades al pulsar **Aplicar filtros**; una lín
 ## Estados y límites
 
 Los estados de carga, error y selección vacía se muestran explícitamente. No se muestran gráficos con valores ficticios cuando faltan registros. Se rechazan periodos invertidos, reglas desconocidas y referencias a grupos de otros análisis. El frontend descarta respuestas de consultas anteriores cuando cambian los filtros.
+
+Si ninguna regla tiene eventos elegibles, se muestra una advertencia de análisis no evaluable, con acceso a revisar las columnas y la cobertura desplegada. No se presenta ese caso como un archivo limpio ni se confunde con una selección sin coincidencias. Las coberturas parciales también se advierten; el resto de reglas puede carecer de campos o contexto.
 
 Esta entrega añade visualización y exploración; no añade nuevas reglas, detección de anomalías, mapas geográficos ni confirmación de incidentes. El rendimiento en el máximo de 100 000 eventos y 500 000 referencias sigue pendiente de medición. El PDF y la aprobación humana auditable siguen siendo fases separadas.

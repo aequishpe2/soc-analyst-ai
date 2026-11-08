@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from starlette.datastructures import UploadFile
 
 from app.jobs import config_digest
+from app.mapping import suggestions
 from app.models import Case, Event, ImportRun, Job, RowIssue, SourceFile
 from app.normalization import FIELDS
 from app.parser import MAX_BYTES
@@ -49,6 +50,7 @@ def file_output(source):
         "size": source.size,
         "status": source.status,
         "manifest": source.manifest,
+        "mapping_suggestions": suggestions(source.manifest),
         "created_at": source.created_at,
     }
 

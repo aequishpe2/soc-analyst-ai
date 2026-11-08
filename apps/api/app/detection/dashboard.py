@@ -73,6 +73,44 @@ class FindingFilters:
         return query
 
 
+def input_activity(db, analysis):
+    scope = (
+        select(Event.id, Event.normalized)
+        .where(
+            Event.case_id == analysis.case_id, Event.import_id.in_(analysis.config["import_ids"])
+        )
+        .subquery()
+    )
+    user = func.trim(scope.c.normalized["user"].as_string())
+    command = func.trim(scope.c.normalized["command"].as_string())
+    code = func.trim(scope.c.normalized["provider_event_id"].as_string())
+    count = func.count()
+    return {
+        "events": db.scalar(select(func.count()).select_from(scope)),
+        "users": db.scalar(
+            select(func.count(func.distinct(user))).where(
+                user.is_not(None), func.lower(user).not_in(sorted(MISSING))
+            )
+        ),
+        "command_events": db.scalar(
+            select(func.count())
+            .select_from(scope)
+            .where(command.is_not(None), func.length(command) > 0)
+        ),
+        "event_codes": [
+            {"value": value, "count": n}
+            for value, n in db.execute(
+                select(code, count)
+                .where(code.is_not(None), func.length(code) > 0, func.length(code) <= 100)
+                .group_by(code)
+                .order_by(count.desc(), code)
+                .limit(8)
+            )
+        ],
+        "evaluable_rules": sum(r["eligible_events"] > 0 for r in analysis.summary["coverage"]),
+    }
+
+
 def aggregate(db, query):
     scope = query.subquery()
     ids = select(scope.c.id)

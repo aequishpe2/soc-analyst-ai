@@ -5,6 +5,13 @@ import { api } from "../../../../lib/api";
 
 type Count = { value: string; count: number; title?: string };
 type Data = {
+  input_activity: {
+    events: number;
+    users: number;
+    command_events: number;
+    event_codes: Count[];
+    evaluable_rules: number;
+  };
   total: number;
   groups: number;
   evidence_events: number;
@@ -127,6 +134,39 @@ export default function Dashboard({
       className="dashboard"
       aria-label="Dashboard interactivo de hallazgos"
     >
+      <section
+        className="dashboard-input"
+        aria-label="Actividad de los registros importados"
+      >
+        <h4>Datos del archivo · análisis completo</h4>
+        <div className="dashboard-stats">
+          <div>
+            <span>Registros importados</span>
+            <strong>{data.input_activity.events}</strong>
+          </div>
+          <div>
+            <span>Usuarios registrados</span>
+            <strong>{data.input_activity.users}</strong>
+          </div>
+          <div>
+            <span>Registros con comando mapeado</span>
+            <strong>{data.input_activity.command_events}</strong>
+          </div>
+          <div>
+            <span>Reglas con eventos evaluables</span>
+            <strong>{data.input_activity.evaluable_rules} / 8</strong>
+          </div>
+        </div>
+        {data.input_activity.event_codes.length > 0 && (
+          <p className="muted">
+            IDs de evento registrados (hasta ocho):{" "}
+            {data.input_activity.event_codes
+              .map((c) => `${c.value}: ${c.count}`)
+              .join(" · ")}
+            . Estos conteos describen la entrada y no son alertas.
+          </p>
+        )}
+      </section>
       <p className="muted">
         Vista filtrada · Los gráficos consideran todos los hallazgos
         coincidentes, incluidas las otras páginas. Pulsa una categoría para
@@ -152,8 +192,11 @@ export default function Dashboard({
       </div>
       {!data.total && (
         <p className="info-note">
-          No hay hallazgos para estos filtros. Amplía la selección o consulta la
-          cobertura del análisis.
+          {data.input_activity.evaluable_rules === 0
+            ? "No se pudo evaluar ninguna regla. Revisa el mapeo y el proveedor antes de interpretar este resultado."
+            : query
+              ? "No hay hallazgos para estos filtros. Amplía la selección o consulta la cobertura del análisis."
+              : "Las reglas evaluables no encontraron coincidencias. Consulta la cobertura para ver qué condiciones no pudieron comprobarse."}
         </p>
       )}
       <div className="dashboard-grid">
