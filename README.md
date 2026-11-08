@@ -12,6 +12,8 @@ Flujo principal: **cargar Excel/CSV → dashboard automático → explicaciones 
 
 La descarga ofrece un **informe conciso para cliente**, seleccionado por defecto, y un **informe técnico completo con anexo**. Ambos conservan todos los hallazgos; el primero resume las evidencias mediante referencias a archivo, hoja y filas.
 
+La **matriz MITRE ATT&CK** permite explorar las técnicas referenciadas por los hallazgos, filtrarlos y consultar sus evidencias. Ambos PDF incluyen un resumen MITRE; las referencias son contextuales y no confirman la ejecución de una técnica.
+
 ## Documentación
 
 - [Arranque local y verificaciones](docs/LOCAL_SETUP.md)
@@ -20,6 +22,7 @@ La descarga ofrece un **informe conciso para cliente**, seleccionado por defecto
 - [Motor 2.0: fuentes, 19 reglas y política de criticidad](docs/DETECTION_V2.md)
 - [IA local: uso, privacidad, validación y límites](docs/AI.md)
 - [Dashboard: gráficos, filtros y significado de los conteos](docs/DASHBOARD.md)
+- [MITRE ATT&CK: matriz interactiva, evidencias y referencias en PDF](docs/MITRE.md)
 - [Carga automática: funcionamiento, decisiones y recuperación](docs/AUTOMATIC.md)
 - [Informe técnico y PDF: contenido, descarga y garantías](docs/REPORTS.md)
 - [Arquitectura y decisiones técnicas](docs/ARCHITECTURE.md)

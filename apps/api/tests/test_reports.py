@@ -195,6 +195,9 @@ def test_client_report_is_default_and_retains_all_findings_and_row_locations(cli
     )
     assert "Anexo de evidencias" not in text
     assert "Confidencial" in text
+    assert "MITRE ATT&CK" in text
+    assert "T1110.001" in text
+    assert "T1110" in text
     assert "REVISIÓN HUMANA PENDIENTE" not in text
     assert "Borrador" not in text
     assert data["sources"][0]["sha256"] in text

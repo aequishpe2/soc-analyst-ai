@@ -10,6 +10,7 @@ const writes = new RegExp(
 );
 const uploadPath = new RegExp(`^v1/cases/${uuid}/files$`);
 const reportPreviewPath = new RegExp(`^v1/analyses/${uuid}/report$`);
+const attackMatrixPath = new RegExp(`^v1/analyses/${uuid}/attack-matrix$`);
 const reportPdfPath = new RegExp(`^v1/analyses/${uuid}/report/pdf$`);
 
 async function readBounded(request: NextRequest, limit: number) {
@@ -54,7 +55,9 @@ async function proxy(
   if (
     !(post
       ? writes.test(route) || reportPdfPath.test(route)
-      : reads.test(route) || reportPreviewPath.test(route))
+      : reads.test(route) ||
+        reportPreviewPath.test(route) ||
+        attackMatrixPath.test(route))
   )
     return NextResponse.json(
       { message: "Ruta no disponible" },

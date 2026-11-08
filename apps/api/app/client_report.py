@@ -17,6 +17,8 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+from app.attack_matrix import report_rows
+
 
 def row_ranges(values):
     """Losslessly compress row numbers; never imply evidence in gaps."""
@@ -229,7 +231,24 @@ def render_client_pdf(data, metadata):
         "y retención de registros; asignar responsables y criterios de cierre. "
         "Estas recomendaciones no implican que dichos controles estén ausentes."
     )
-    add("7. Fuentes y trazabilidad", heading)
+    add("7. MITRE ATT&CK - referencias del análisis", heading)
+    attack = data["attack_matrix"]
+    add(
+        f"Enterprise {attack['release']}. Referencias contextuales, no técnicas confirmadas. "
+        "Las tácticas son categorías del catálogo, no fases de ataque demostradas. "
+        "Una técnica puede figurar en varias tácticas; no sumar sus conteos como incidentes.",
+        small,
+    )
+    if attack["techniques"]:
+        table(report_rows(data), [23, 91, 58])
+    else:
+        add("No hay referencias activas a técnicas en los hallazgos de este análisis.", small)
+    add(
+        f"Hallazgos sin referencia activa: {attack['unmapped_findings']}. "
+        "Fuente: https://attack.mitre.org/matrices/enterprise/",
+        small,
+    )
+    add("8. Fuentes y trazabilidad", heading)
     for n, source in enumerate(data["sources"], 1):
         add(f"F{n}: {source['name']} | Importación: {source['import_id']}", small)
         add(f"SHA-256 verificado: {source['sha256']}", small)

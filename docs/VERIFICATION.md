@@ -1,5 +1,15 @@
 # Verificación de la base local
 
+## Matriz MITRE ATT&CK - 8 de noviembre de 2026
+
+- **223 pruebas aprobadas** en la batería completa. Se mantiene el aviso existente de deprecación de Starlette/httpx en TestClient.
+- Catálogo oficial Enterprise 20.1: 15 tácticas y 16 referencias utilizadas por el motor; fuente y SHA-256 del bundle registrados. La referencia retirada T1562 no se reasigna automáticamente.
+- Matriz verificada con filtros compartidos, conteos únicos, aislamiento entre casos, estados vacíos/no evaluables, referencias desconocidas/retiradas, validación de técnica y correspondencia con la instantánea del informe.
+- Prueba en navegador: selección T1490, filtrado a un hallazgo y apertura de su evidencia original con SHA-256. Retirada del filtro y navegación de la matriz verificadas. Captura y datos de verificación privados en `.local`, excluidos de Git.
+- En el caso local: 20 hallazgos; 18 con referencia activa, 2 sin técnica asignada y 10 técnicas distintas relacionadas. Los conteos de las columnas no se suman como incidentes.
+- Matriz compacta incluida en los dos formatos PDF. El formato para cliente mantiene **6 páginas** y todos sus hallazgos y referencias. Revisión visual de la tabla MITRE y trazabilidad; no reaparece la leyenda de borrador eliminada.
+- Ruff, formato, TypeScript y compilación de producción aprobados. No hay dependencias ni migraciones nuevas. Ver [MITRE.md](MITRE.md).
+
 ## Informe técnico y PDF - 8 de noviembre de 2026
 
 Actualización de presentación: el formato predeterminado para cliente se redujo de 56 a **6 páginas** en el caso local, manteniendo los 20 hallazgos y las referencias exactas a las 80 evidencias. Se revisaron visualmente las seis páginas y se comprobó la descarga mediante el proxy de la aplicación. **Nueve pruebas de informes aprobadas**, incluidas compresión de filas sin añadir huecos, conservación de hallazgos y selección/validación del formato. Ruff, formato y compilación con TypeScript aprobados. El formato técnico completo permanece disponible como opción.

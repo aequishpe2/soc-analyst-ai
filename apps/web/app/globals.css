@@ -1432,3 +1432,94 @@ summary:focus-visible {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.attack-matrix {
+  margin-block: 2rem;
+  min-width: 0;
+  scroll-margin-top: 1rem;
+}
+.attack-stats {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-block: 1rem;
+}
+.attack-stats strong {
+  color: var(--accent);
+  font-size: 1.3rem;
+}
+.attack-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+}
+.attack-columns {
+  display: grid;
+  grid-template-columns: repeat(15, 185px);
+  gap: 10px;
+  align-items: start;
+}
+.attack-column header {
+  min-height: 80px;
+  padding: 12px;
+  background: #102440;
+  border-radius: 6px;
+  font-weight: 700;
+}
+.attack-column header small {
+  display: block;
+  font-weight: 400;
+  margin-top: 7px;
+  color: var(--muted);
+}
+.attack-cell {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: #102036;
+}
+.attack-cell[data-severity="Crítico"] {
+  border-left-color: #ff7599;
+}
+.attack-cell[data-severity="Alto"] {
+  border-left-color: #ffb878;
+}
+.attack-cell[data-severity="Medio"] {
+  border-left-color: #e8ce70;
+}
+.attack-cell[data-severity="Bajo"] {
+  border-left-color: #6bd3bc;
+}
+.attack-cell button {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  width: 100%;
+  color: var(--ink);
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+}
+.attack-cell button[aria-pressed="true"] {
+  background: #214674;
+  outline: 2px solid var(--accent);
+}
+.attack-cell button small {
+  color: var(--muted);
+}
+.attack-cell > a {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--accent);
+  padding: 4px 12px 12px;
+}
+.attack-empty {
+  font-size: 0.8rem;
+  padding: 10px;
+}
+.attack-scroll:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}

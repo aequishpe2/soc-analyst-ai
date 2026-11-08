@@ -8,6 +8,7 @@ import AIDraft from "./ai-draft";
 import Dashboard from "./dashboard";
 import AssistantSummary from "./assistant-summary";
 import TechnicalReport from "./report";
+import AttackMatrix from "./attack-matrix";
 import {
   Analysis,
   Coverage,
@@ -138,6 +139,7 @@ export default function AnalysisWorkspace({
   const [pollTick, setPollTick] = useState(0);
   const [severity, setSeverity] = useState("");
   const [rule, setRule] = useState("");
+  const [technique, setTechnique] = useState("");
   const [groupId, setGroupId] = useState("");
   const [filters, setFilters] = useState(emptyFilters);
   const [draftFilters, setDraftFilters] = useState(emptyFilters);
@@ -241,6 +243,7 @@ export default function AnalysisWorkspace({
     setGroupId("");
     setSeverity("");
     setRule("");
+    setTechnique("");
     setFilters(emptyFilters);
     setDraftFilters(emptyFilters);
     setFindingOffset(0);
@@ -275,6 +278,7 @@ export default function AnalysisWorkspace({
   const filterParams = new URLSearchParams();
   if (severity) filterParams.set("severity", severity);
   if (rule) filterParams.set("rule_id", rule);
+  if (technique) filterParams.set("technique_id", technique);
   if (groupId) filterParams.set("group_id", groupId);
   for (const [key, value] of Object.entries(filters)) {
     if (value) filterParams.set(key, value);
@@ -1073,6 +1077,7 @@ export default function AnalysisWorkspace({
                     onClick={() => {
                       setSeverity("");
                       setRule("");
+                      setTechnique("");
                       setGroupId("");
                       applyFilters(emptyFilters);
                     }}
@@ -1085,6 +1090,7 @@ export default function AnalysisWorkspace({
                 Filtros aplicados:{" "}
                 {[
                   severity,
+                  technique ? `MITRE: ${technique}` : "",
                   rule
                     ? (catalog.find((r) => r.id === rule)?.title ?? rule)
                     : "",
@@ -1133,6 +1139,15 @@ export default function AnalysisWorkspace({
                 <summary>Cobertura del análisis completo</summary>
                 <CoverageTable rows={analysis.summary.coverage} />
               </details>
+              <AttackMatrix
+                analysisId={analysis.id}
+                query={filterQuery}
+                selected={technique}
+                onSelect={(value) => {
+                  setTechnique(value);
+                  setFindingOffset(0);
+                }}
+              />
               <h3 id="findings">Hallazgos sustentados · vista filtrada</h3>
               {findingsLoading && <p role="status">Recuperando hallazgos…</p>}
               {findingsError && (
@@ -1289,6 +1304,7 @@ export default function AnalysisWorkspace({
                     className="secondary"
                     onClick={() => {
                       setGroupId(g.id);
+                      setTechnique("");
                       setSeverity("");
                       setRule("");
                       setFindingOffset(0);

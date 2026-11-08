@@ -1,0 +1,266 @@
+{
+  "release": "20.1",
+  "source": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack-20.1.json",
+  "sha256": "539a843a7b53ed9749740b2123dddae3726b1a4831841c32aca740b011b910b5",
+  "tactics": [
+    {
+      "id": "TA0043",
+      "name": "Reconnaissance",
+      "url": "https://attack.mitre.org/tactics/TA0043",
+      "slug": "reconnaissance"
+    },
+    {
+      "id": "TA0042",
+      "name": "Resource Development",
+      "url": "https://attack.mitre.org/tactics/TA0042",
+      "slug": "resource-development"
+    },
+    {
+      "id": "TA0001",
+      "name": "Initial Access",
+      "url": "https://attack.mitre.org/tactics/TA0001",
+      "slug": "initial-access"
+    },
+    {
+      "id": "TA0002",
+      "name": "Execution",
+      "url": "https://attack.mitre.org/tactics/TA0002",
+      "slug": "execution"
+    },
+    {
+      "id": "TA0003",
+      "name": "Persistence",
+      "url": "https://attack.mitre.org/tactics/TA0003",
+      "slug": "persistence"
+    },
+    {
+      "id": "TA0004",
+      "name": "Privilege Escalation",
+      "url": "https://attack.mitre.org/tactics/TA0004",
+      "slug": "privilege-escalation"
+    },
+    {
+      "id": "TA0005",
+      "name": "Stealth",
+      "url": "https://attack.mitre.org/tactics/TA0005",
+      "slug": "stealth"
+    },
+    {
+      "id": "TA0112",
+      "name": "Defense Impairment",
+      "url": "https://attack.mitre.org/tactics/TA0112",
+      "slug": "defense-impairment"
+    },
+    {
+      "id": "TA0006",
+      "name": "Credential Access",
+      "url": "https://attack.mitre.org/tactics/TA0006",
+      "slug": "credential-access"
+    },
+    {
+      "id": "TA0007",
+      "name": "Discovery",
+      "url": "https://attack.mitre.org/tactics/TA0007",
+      "slug": "discovery"
+    },
+    {
+      "id": "TA0008",
+      "name": "Lateral Movement",
+      "url": "https://attack.mitre.org/tactics/TA0008",
+      "slug": "lateral-movement"
+    },
+    {
+      "id": "TA0009",
+      "name": "Collection",
+      "url": "https://attack.mitre.org/tactics/TA0009",
+      "slug": "collection"
+    },
+    {
+      "id": "TA0011",
+      "name": "Command and Control",
+      "url": "https://attack.mitre.org/tactics/TA0011",
+      "slug": "command-and-control"
+    },
+    {
+      "id": "TA0010",
+      "name": "Exfiltration",
+      "url": "https://attack.mitre.org/tactics/TA0010",
+      "slug": "exfiltration"
+    },
+    {
+      "id": "TA0040",
+      "name": "Impact",
+      "url": "https://attack.mitre.org/tactics/TA0040",
+      "slug": "impact"
+    }
+  ],
+  "techniques": {
+    "T1053.005": {
+      "id": "T1053.005",
+      "name": "Scheduled Task",
+      "url": "https://attack.mitre.org/techniques/T1053/005",
+      "tactics": [
+        "TA0002",
+        "TA0003",
+        "TA0004"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1560.001": {
+      "id": "T1560.001",
+      "name": "Archive via Utility",
+      "url": "https://attack.mitre.org/techniques/T1560/001",
+      "tactics": [
+        "TA0009"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1110.001": {
+      "id": "T1110.001",
+      "name": "Password Guessing",
+      "url": "https://attack.mitre.org/techniques/T1110/001",
+      "tactics": [
+        "TA0006"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1543.003": {
+      "id": "T1543.003",
+      "name": "Windows Service",
+      "url": "https://attack.mitre.org/techniques/T1543/003",
+      "tactics": [
+        "TA0003",
+        "TA0004"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1135": {
+      "id": "T1135",
+      "name": "Network Share Discovery",
+      "url": "https://attack.mitre.org/techniques/T1135",
+      "tactics": [
+        "TA0007"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1562": {
+      "id": "T1562",
+      "name": "Impair Defenses",
+      "url": "https://attack.mitre.org/techniques/T1562",
+      "tactics": [
+        "TA0005"
+      ],
+      "revoked": true,
+      "deprecated": false
+    },
+    "T1021.002": {
+      "id": "T1021.002",
+      "name": "SMB/Windows Admin Shares",
+      "url": "https://attack.mitre.org/techniques/T1021/002",
+      "tactics": [
+        "TA0008"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1021": {
+      "id": "T1021",
+      "name": "Remote Services",
+      "url": "https://attack.mitre.org/techniques/T1021",
+      "tactics": [
+        "TA0008"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1505.003": {
+      "id": "T1505.003",
+      "name": "Web Shell",
+      "url": "https://attack.mitre.org/techniques/T1505/003",
+      "tactics": [
+        "TA0003"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1110.003": {
+      "id": "T1110.003",
+      "name": "Password Spraying",
+      "url": "https://attack.mitre.org/techniques/T1110/003",
+      "tactics": [
+        "TA0006"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1070": {
+      "id": "T1070",
+      "name": "Indicator Removal",
+      "url": "https://attack.mitre.org/techniques/T1070",
+      "tactics": [
+        "TA0005"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1041": {
+      "id": "T1041",
+      "name": "Exfiltration Over C2 Channel",
+      "url": "https://attack.mitre.org/techniques/T1041",
+      "tactics": [
+        "TA0010"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1098": {
+      "id": "T1098",
+      "name": "Account Manipulation",
+      "url": "https://attack.mitre.org/techniques/T1098",
+      "tactics": [
+        "TA0003",
+        "TA0004"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1110": {
+      "id": "T1110",
+      "name": "Brute Force",
+      "url": "https://attack.mitre.org/techniques/T1110",
+      "tactics": [
+        "TA0006"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1078": {
+      "id": "T1078",
+      "name": "Valid Accounts",
+      "url": "https://attack.mitre.org/techniques/T1078",
+      "tactics": [
+        "TA0005",
+        "TA0003",
+        "TA0004",
+        "TA0001"
+      ],
+      "revoked": false,
+      "deprecated": false
+    },
+    "T1490": {
+      "id": "T1490",
+      "name": "Inhibit System Recovery",
+      "url": "https://attack.mitre.org/techniques/T1490",
+      "tactics": [
+        "TA0040"
+      ],
+      "revoked": false,
+      "deprecated": false
+    }
+  }
+}

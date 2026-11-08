@@ -25,6 +25,7 @@ from reportlab.platypus import (
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.attack_matrix import matrix, report_rows
 from app.client_report import render_client_pdf
 from app.detection.dashboard import PRIORITY_ORDER
 from app.fingerprints import config_digest, digest_file
@@ -41,7 +42,7 @@ from app.models import (
     SourceFile,
 )
 
-VERSION = "technical-report-2"
+VERSION = "technical-report-3"
 MAX_FINDINGS = 2000
 MAX_REFERENCES = 20000
 MAX_BYTES = 20 * 1024 * 1024
@@ -185,6 +186,7 @@ def snapshot(db, storage, analysis_id):
             )
         ],
     }
+    result["attack_matrix"] = matrix({**item["data"], "id": item["id"]} for item in items)
     encoded = json.dumps(result, ensure_ascii=False).encode()
     if len(encoded) > MAX_BYTES:
         raise HTTPException(413, "El informe supera 20 MiB de contenido. Reduce el alcance.")
@@ -455,6 +457,30 @@ def render_pdf(data, metadata):
         )
         add(group["interpretation"])
         details(group.get("links", []))
+    heading("MITRE ATT&CK - matriz de referencias")
+    attack = data["attack_matrix"]
+    add(f"Enterprise {attack['release']}. {attack['interpretation']}")
+    attack_table = LongTable(
+        [[p(cell, "ReportSmall") for cell in row] for row in report_rows(data)],
+        colWidths=[25 * mm, 85 * mm, 60 * mm],
+        repeatRows=1,
+    )
+    attack_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e7effb")),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ]
+        )
+    )
+    story.append(attack_table)
+    add(
+        f"Hallazgos sin referencia activa: {attack['unmapped_findings']}. "
+        "Las referencias retiradas o desconocidas se conservan en los hallazgos "
+        "y no se reclasifican automáticamente.",
+        "ReportSmall",
+    )
+    add("Fuente: https://attack.mitre.org/matrices/enterprise/", "ReportSmall")
     heading("6. Recomendaciones generales")
     add(
         "Las siguientes medidas son recomendaciones preventivas; no describen controles "

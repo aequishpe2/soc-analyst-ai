@@ -4,6 +4,8 @@ Desde el dashboard, abrir **Informe técnico → Preparar informe**. Revisar el 
 
 ## Formatos de descarga
 
+La versión `technical-report-3` incorpora una matriz resumida MITRE ATT&CK en ambos formatos: técnicas, tácticas y etiquetas de los hallazgos relacionados, con conteo de referencias no activas. Las referencias son contextuales, no técnicas confirmadas. Ver [MITRE.md](MITRE.md). El caso local conserva seis páginas en su formato para cliente.
+
 **Para cliente · conciso** es el formato predeterminado desde la versión `technical-report-2`. Presenta resumen ejecutivo, todos los hallazgos con criticidad justificada, impacto posible, limitaciones y acciones, correlaciones, cobertura resumida, recomendaciones y fuentes verificadas. Cada hallazgo cita archivo, hoja y filas de evidencia. Los rangos solo agrupan filas consecutivas existentes; no incluyen huecos. Evita portada aislada, explicaciones repetidas, configuración interna y volcado de cada celda. No elimina hallazgos ni cambia la clasificación. Los caracteres fuera de Latin-1 se representan como `[U+XXXX]`, igual que en el formato técnico.
 
 **Técnico completo · con anexo de registros** conserva el detalle ampliado descrito abajo y la opción de incluir explicaciones IA. El formato para cliente resume los hechos del motor; las explicaciones ampliadas de IA permanecen en la aplicación y en el formato técnico. La vista previa permite consultar el detalle completo con cualquiera de los dos formatos.
@@ -41,7 +43,7 @@ No se persiste el PDF en el servidor al descargar: el usuario conserva la copia 
 
 ## API
 
-- `GET /api/v1/analyses/{id}/report`: instantánea completa para vista previa, versión `technical-report-2` y `snapshot_hash`.
+- `GET /api/v1/analyses/{id}/report`: instantánea completa para vista previa, versión `technical-report-3`, matriz MITRE y `snapshot_hash`.
 - `POST /api/v1/analyses/{id}/report/pdf`: descarga binaria. JSON opcional por campos: `analyst`, `client`, `organization`, `reference`, `format` (`client` por defecto o `technical`), `include_ai` (por defecto true; aplicable al formato técnico), `snapshot_hash`. El cuerpo JSON es obligatorio; usar `{}` para los valores por defecto. Si se proporciona la huella, debe coincidir.
 
 El proxy web admite únicamente estas rutas adicionales, conserva la comprobación de origen para POST, limita la respuesta binaria y fija el tipo y nombre de descarga.

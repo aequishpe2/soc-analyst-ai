@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.attack_matrix import matrix
 from app.detection.config import ENGINE_VERSION, MAX_EVENTS, RULESET_VERSION, DetectionConfig
 from app.detection.dashboard import PRIORITY_ORDER, FindingFilters, aggregate, input_activity
 from app.detection.engine import RULES
@@ -262,6 +263,14 @@ def router_for(engine, jobs):
             **aggregate(db, filters.query(db, analysis_id)),
             "input_activity": input_activity(db, analysis),
         }
+
+    @router.get("/analyses/{analysis_id}/attack-matrix")
+    def attack_matrix(analysis_id: uuid.UUID, db: DB, filters: Filters):
+        completed(db, analysis_id)
+        return matrix(
+            {**f.payload, "id": f.id}
+            for f in db.scalars(filters.query(db, analysis_id).order_by(PRIORITY_ORDER, Finding.id))
+        )
 
     @router.get("/analyses/{analysis_id}/findings/{finding_id}/evidence")
     def evidence(

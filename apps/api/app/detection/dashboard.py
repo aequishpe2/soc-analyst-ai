@@ -27,6 +27,7 @@ class FindingFilters:
         date_to: date | None = None,
         user: Annotated[str | None, Query(min_length=1, max_length=256)] = None,
         host: Annotated[str | None, Query(min_length=1, max_length=256)] = None,
+        technique_id: Annotated[str | None, Query(pattern=r"^T\d{4}(?:\.\d{3})?$")] = None,
     ):
         if date_from and date_to and date_from > date_to:
             raise HTTPException(422, "La fecha inicial debe ser anterior o igual a la final.")
@@ -35,9 +36,14 @@ class FindingFilters:
         self.severity, self.rule_id, self.group_id = severity, rule_id, group_id
         self.date_from, self.date_to = date_from, date_to
         self.user, self.host = user, host
+        self.technique_id = technique_id
 
     def query(self, db, analysis_id):
         query = select(Finding).where(Finding.analysis_id == str(analysis_id))
+        if self.technique_id:
+            query = query.where(
+                Finding.payload["attack_reference"].as_string() == self.technique_id
+            )
         if self.severity:
             query = query.where(Finding.severity == self.severity)
         if self.rule_id:
