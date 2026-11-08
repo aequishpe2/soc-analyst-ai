@@ -1,5 +1,15 @@
 # Verificación de la base local
 
+## Informe técnico y PDF - 8 de noviembre de 2026
+
+- Batería completa: **216 pruebas aprobadas**, incluidas siete pruebas nuevas del informe. Persiste el aviso previo de deprecación de Starlette/httpx en TestClient.
+- Ruff, formato Python, TypeScript, Prettier y compilación de producción aprobados. Dependencias de generación y extracción fijadas en `uv.lock`; no se requiere una migración nueva.
+- Generación sobre el análisis local: 20 hallazgos, 80 evidencias distintas y 20 explicaciones IA, sin cambios en las prioridades. Se verificó por extracción que todos los identificadores de hallazgo y evidencia aparecen en el PDF. Documento de 56 páginas, con anexo completo y configuración. Los datos, resultados y capturas permanecen fuera de Git.
+- Revisión visual con Poppler de portada, cobertura, hallazgo crítico, anexo y cierre. Ajustados los encabezados y el inicio de la sección de trazabilidad para evitar encabezados aislados y un cierre de pocas líneas.
+- Descarga real desde el navegador mediante el proxy web y la API; vista previa, metadatos opcionales, inclusión de IA y conteos comprobados. Servicios locales reiniciados con la versión actual.
+
+Ver [REPORTS.md](REPORTS.md) para garantías y límites. No se validó el rendimiento en el máximo de referencias ni la ejecución remota de GitHub Actions. La exportación no implica revisión o aprobación humana.
+
 Verificado el 7 de noviembre de 2026 sobre Windows, con Node 24 y Python 3.12 administrados dentro de `.tools/` (ignorado por Git).
 
 | Comprobación | Resultado |

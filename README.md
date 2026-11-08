@@ -4,11 +4,11 @@ Aplicación web local en desarrollo para apoyar a analistas SOC Nivel 2 con regi
 
 ## Estado
 
-Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, 19 reglas contextuales, cobertura y grupos de investigación con evidencias trazables. El motor 2.0 interpreta por registro Windows Security/System, PowerShell y los formatos admitidos de Proxy/IIS/Firewall; explica la prioridad de cada hallazgo y conserva los resultados históricos. El dashboard incluye criticidad, reglas, fechas, usuarios y equipos, con filtros compartidos con la lista. Ollama/Qwen3:8b prepara explicaciones y planes de acción a partir de contenido validado. No se solicita configuración horaria. Siguen pendientes revisión humana con cambios auditados, consultas autónomas del agente e informe global con PDF.
+Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, 19 reglas contextuales, cobertura y grupos de investigación con evidencias trazables. El motor 2.0 interpreta por registro Windows Security/System, PowerShell y los formatos admitidos de Proxy/IIS/Firewall; explica la prioridad de cada hallazgo y conserva los resultados históricos. El dashboard incluye criticidad, reglas, fechas, usuarios y equipos, con filtros compartidos con la lista. Ollama/Qwen3:8b prepara explicaciones y planes de acción a partir de contenido validado. No se solicita configuración horaria. El informe técnico completo dispone de vista previa y descarga PDF con todos los hallazgos y evidencias del análisis. Siguen pendientes revisión humana con cambios auditados y consultas autónomas del agente.
 
 En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://127.0.0.1:3000`. Usar `Detener-SOC.cmd` al terminar. Las herramientas y el modelo se instalan fuera del control de versiones; un clon nuevo requiere seguir la guía de arranque.
 
-Flujo principal: **cargar Excel/CSV → dashboard automático → explicaciones con IA local**. Las columnas y fechas se proponen automáticamente; si hay ambigüedad se pide revisar el formato. La vista azul conserva los gráficos, hallazgos, evidencias y seguimiento de la IA, sin tener que iniciar cada explicación manualmente.
+Flujo principal: **cargar Excel/CSV → dashboard automático → explicaciones con IA local → informe técnico y PDF**. Las columnas y fechas se proponen automáticamente; si hay ambigüedad se pide revisar el formato. La vista azul conserva los gráficos, hallazgos, evidencias y seguimiento de la IA, sin tener que iniciar cada explicación manualmente.
 
 ## Documentación
 
@@ -19,6 +19,7 @@ Flujo principal: **cargar Excel/CSV → dashboard automático → explicaciones 
 - [IA local: uso, privacidad, validación y límites](docs/AI.md)
 - [Dashboard: gráficos, filtros y significado de los conteos](docs/DASHBOARD.md)
 - [Carga automática: funcionamiento, decisiones y recuperación](docs/AUTOMATIC.md)
+- [Informe técnico y PDF: contenido, descarga y garantías](docs/REPORTS.md)
 - [Arquitectura y decisiones técnicas](docs/ARCHITECTURE.md)
 - [Contrato analítico, modelo de datos y API](docs/ANALYSIS_SPEC.md)
 - [Plan de desarrollo y criterios de aceptación](docs/ROADMAP.md)

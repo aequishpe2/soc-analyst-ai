@@ -110,6 +110,7 @@ export default function Overview({
           <Link href={`/cases/${caseId}`}>≡ &nbsp; Explorador de eventos</Link>
           <a href="#correlations">◇ &nbsp; Correlaciones</a>
           <a href="#ai-summary">✧ &nbsp; Explicaciones con IA</a>
+          <a href="#technical-report">▤ &nbsp; Informe técnico</a>
           <Link href={`/cases/${caseId}/analysis`}>
             ⚙ &nbsp; Ajustes avanzados
           </Link>

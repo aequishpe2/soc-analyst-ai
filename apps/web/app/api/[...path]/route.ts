@@ -9,6 +9,8 @@ const writes = new RegExp(
   `^v1/(?:cases|cases/${uuid}/(?:files|analyses)|files/${uuid}/imports|jobs/${uuid}/retry|analyses/${uuid}/(?:retry|assistant)|cases/${uuid}/files/${uuid}/automatic|analyses/${uuid}/findings/${uuid}/draft)$`,
 );
 const uploadPath = new RegExp(`^v1/cases/${uuid}/files$`);
+const reportPreviewPath = new RegExp(`^v1/analyses/${uuid}/report$`);
+const reportPdfPath = new RegExp(`^v1/analyses/${uuid}/report/pdf$`);
 
 async function readBounded(request: NextRequest, limit: number) {
   if (Number(request.headers.get("content-length")) > limit)
@@ -49,7 +51,11 @@ async function proxy(
   const route = path.join("/");
   const post = request.method === "POST";
   const headers = { "Cache-Control": "no-store" };
-  if (!(post ? writes : reads).test(route))
+  if (
+    !(post
+      ? writes.test(route) || reportPdfPath.test(route)
+      : reads.test(route) || reportPreviewPath.test(route))
+  )
     return NextResponse.json(
       { message: "Ruta no disponible" },
       { status: 404, headers },
@@ -89,6 +95,45 @@ async function proxy(
         signal: AbortSignal.timeout(30000),
       },
     );
+    if (
+      post &&
+      reportPdfPath.test(route) &&
+      response.ok &&
+      response.headers.get("content-type")?.startsWith("application/pdf")
+    ) {
+      const reader = response.body?.getReader();
+      const chunks: Uint8Array[] = [];
+      let size = 0;
+      if (!reader) throw new Error("PDF vacío");
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          size += value.byteLength;
+          if (size > 20 * 1024 * 1024) {
+            await reader.cancel();
+            throw new RangeError();
+          }
+          chunks.push(value);
+        }
+      } finally {
+        reader.releaseLock();
+      }
+      const bytes = new Uint8Array(size);
+      let offset = 0;
+      for (const chunk of chunks) {
+        bytes.set(chunk, offset);
+        offset += chunk.byteLength;
+      }
+      return new NextResponse(bytes, {
+        headers: {
+          ...headers,
+          "Content-Type": "application/pdf",
+          "Content-Disposition": 'attachment; filename="informe-soc.pdf"',
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
     const text = await response.text();
     let data;
     try {

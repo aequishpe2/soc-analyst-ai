@@ -1377,3 +1377,58 @@ summary:focus-visible {
     font-size: 18px;
   }
 }
+.technical-report {
+  margin-top: 2rem;
+  scroll-margin-top: 1rem;
+}
+.report-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+.report-fields label {
+  display: grid;
+  gap: 0.5rem;
+}
+.technical-report .secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+.technical-report .check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.technical-report .check-row input {
+  width: auto;
+  margin: 0;
+}
+.report-preview {
+  margin-block: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border, #2b405b);
+  border-radius: 12px;
+}
+.report-risk-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-block: 1rem;
+}
+.report-risk-summary span {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #102036;
+}
+.report-hash {
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+}
+.report-preview pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

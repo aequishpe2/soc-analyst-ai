@@ -22,6 +22,7 @@ from app.detection.routes import router_for as detection_router
 from app.ingestion import router_for
 from app.jobs import LocalJobs
 from app.models import Case
+from app.reports import router_for as report_router
 from app.settings import Settings
 
 
@@ -83,6 +84,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(detection_router(engine, jobs))
     app.include_router(ai_router(engine, jobs, settings))
     app.include_router(automatic_router(engine, jobs, settings))
+    app.include_router(report_router(engine, storage))
     app.add_middleware(RequestBodyLimitMiddleware, max_body_size=20 * 1024 * 1024 + 65536)
     app.add_middleware(
         TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "api", "testserver"]

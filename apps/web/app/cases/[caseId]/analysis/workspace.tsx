@@ -7,6 +7,7 @@ import FindingEvidence, { OriginalEvidence } from "./evidence";
 import AIDraft from "./ai-draft";
 import Dashboard from "./dashboard";
 import AssistantSummary from "./assistant-summary";
+import TechnicalReport from "./report";
 import {
   Analysis,
   Coverage,
@@ -1246,6 +1247,10 @@ export default function AnalysisWorkspace({
               {compact && (
                 <AssistantSummary key={analysis.id} analysisId={analysis.id} />
               )}
+              <TechnicalReport
+                key={`report-${analysis.id}`}
+                analysisId={analysis.id}
+              />
               <h3 id="correlations">
                 Correlación · grupos del análisis completo
               </h3>
