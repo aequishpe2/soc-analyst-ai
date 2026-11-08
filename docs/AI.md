@@ -29,11 +29,11 @@ El borrador conserva explícitamente la incertidumbre del motor. El impacto es p
 
 ## Presupuestos y recuperación
 
-Un trabajo por hallazgo, en la cola local de ocho posiciones y con un solo consumidor. Contexto de 4096 tokens, salida máxima de 512 tokens, solicitud máxima de 24 KiB, respuesta máxima de 16 KiB y plazo de inferencia de 180 segundos. La comprobación de disponibilidad del modelo tiene su propio timeout de cinco segundos. Máximo seis referencias candidatas con representación de los roles; no se presenta esa selección como el conjunto completo de evidencias.
+Un trabajo persistente por hallazgo, procesado por un consumidor de IA serial separado de la cola de importación. El flujo automático solicita todos los borradores y muestra su progreso; ver [AUTOMATIC.md](AUTOMATIC.md). Contexto de 4096 tokens, salida máxima de 512 tokens, solicitud máxima de 24 KiB, respuesta máxima de 16 KiB y plazo de inferencia de 180 segundos. La comprobación de disponibilidad del modelo tiene su propio timeout de cinco segundos. Máximo seis referencias candidatas con representación de los roles; no se presenta esa selección como el conjunto completo de evidencias.
 
 Se usa temperatura 0 y semilla 17; esto reduce variación, sin prometer determinismo de inferencia entre equipos o versiones. La selección de evidencias es una ayuda de navegación, no una nueva detección ni una prueba de causalidad.
 
-Si Ollama está caído, falta el modelo, cambia el archivo, se supera un presupuesto o la respuesta no es válida, el trabajo falla con un mensaje explícito y sin resultado parcial. El análisis determinista sigue disponible. Las importaciones comparten el consumidor local con la IA; pueden esperar hasta que termine el trabajo activo. El despliegue distribuido sigue pendiente.
+Si Ollama está caído, falta el modelo, cambia el archivo, se supera un presupuesto o la respuesta no es válida, el trabajo falla con un mensaje explícito y sin resultado parcial. El análisis determinista sigue disponible. Las nuevas importaciones pueden continuar mientras el consumidor de IA trabaja. El despliegue distribuido sigue pendiente.
 
 ## API
 

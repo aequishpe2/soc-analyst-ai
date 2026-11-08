@@ -14,9 +14,10 @@ from sqlalchemy import insert, inspect, select
 from sqlalchemy.orm import Session
 
 from app.ai import execute_draft
+from app.automatic import execute_automatic
 from app.detection.service import execute_analysis
 from app.fingerprints import config_digest, digest_file
-from app.models import AIDraft, Analysis, Event, ImportRun, Job, RowIssue, SourceFile
+from app.models import AIDraft, Analysis, AutomaticRun, Event, ImportRun, Job, RowIssue, SourceFile
 from app.normalization import normalize
 
 
@@ -27,6 +28,8 @@ class LocalJobs:
         self.queue = asyncio.Queue(maxsize=8)
         self.task = None
         self.ai_provider = ai_provider
+        self.ai_task = None
+        self.stopping = False
 
     async def start(self):
         # Do not pretend interrupted jobs completed. User can explicitly retry them.
@@ -54,12 +57,23 @@ class LocalJobs:
                     draft.status = "failed"
                     draft.result = None
                     draft.error = "Borrador interrumpido al reiniciar. Puedes reintentarlo."
+            if inspect(self.engine).has_table("automatic_runs"):
+                for run in db.scalars(
+                    select(AutomaticRun).where(AutomaticRun.status.in_(["queued", "running"]))
+                ):
+                    run.status = "failed"
+                    run.error = "Flujo interrumpido al reiniciar. Puedes reintentarlo."
             db.commit()
         self.task = asyncio.create_task(self.consume())
+        if inspect(self.engine).has_table("ai_drafts"):
+            self.ai_task = asyncio.create_task(self.consume_ai())
 
     async def close(self):
         # One local worker, graceful drain before engine disposal (no partial commits).
         await self.queue.join()
+        self.stopping = True
+        if self.ai_task:
+            await self.ai_task
         if self.task:
             self.task.cancel()
             try:
@@ -78,7 +92,33 @@ class LocalJobs:
             finally:
                 self.queue.task_done()
 
+    async def consume_ai(self):
+        # One serial model consumer; imports and detection remain responsive.
+        while not self.stopping:
+            with Session(self.engine) as db:
+                identifier = db.scalar(
+                    select(AIDraft.id)
+                    .where(AIDraft.status == "queued")
+                    .order_by(AIDraft.created_at, AIDraft.id)
+                    .limit(1)
+                )
+            if identifier:
+                try:
+                    await asyncio.to_thread(
+                        execute_draft, self.engine, self.storage, identifier, self.ai_provider
+                    )
+                except Exception:
+                    logging.getLogger(__name__).error(
+                        "AI job infrastructure failed: %s", identifier
+                    )
+                    await asyncio.sleep(1)
+            else:
+                await asyncio.sleep(0.1)
+
     def execute(self, job_id):
+        if job_id.startswith("automatic:"):
+            execute_automatic(self, job_id.split(":", 1)[1])
+            return
         if job_id.startswith("draft:"):
             execute_draft(self.engine, self.storage, job_id.split(":", 1)[1], self.ai_provider)
             return

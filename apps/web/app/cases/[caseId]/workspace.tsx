@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { api, warningLabel } from "../../../lib/api";
+import AutoUpload from "../../../lib/auto-upload";
 
 type Summary = {
   total: number;
@@ -371,8 +372,8 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
     <main className="import-main">
       <header>
         <Link href="/">← Investigaciones</Link>
-        <Link className="secondary" href={`/cases/${caseId}/analysis`}>
-          Análisis de seguridad →
+        <Link className="secondary" href={`/cases/${caseId}/overview`}>
+          Dashboard e IA →
         </Link>
       </header>
       <section className="heading">
@@ -403,50 +404,54 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
         <section className="panel">
           <p className="eyebrow">ARCHIVOS DEL CASO</p>
           <h2>Fuentes de evidencia</h2>
-          <form onSubmit={upload}>
-            <label htmlFor="file">Excel (.xlsx) o CSV · máximo 20 MiB</label>
-            <input
-              id="file"
-              type="file"
-              accept=".csv,.xlsx"
-              ref={uploadRef}
-              required
-              disabled={working}
-            />
-            <details className="csv-options">
-              <summary>Opciones de CSV</summary>
-              <label htmlFor="encoding">Codificación</label>
-              <select
-                id="encoding"
-                value={encoding}
-                onChange={(e) => setEncoding(e.target.value)}
-              >
-                <option value="auto">UTF-8 o UTF-16 con BOM</option>
-                <option value="utf-8-sig">UTF-8</option>
-                <option value="utf-16">UTF-16 con BOM</option>
-                <option value="cp1252">Windows-1252</option>
-              </select>
-              <label htmlFor="delimiter">Separador</label>
-              <select
-                id="delimiter"
-                value={delimiter}
-                onChange={(e) => setDelimiter(e.target.value)}
-              >
-                <option value="auto">Detectar y mostrar</option>
-                <option value=",">Coma</option>
-                <option value=";">Punto y coma</option>
-                <option value={"\t"}>Tabulación</option>
-                <option value="|">Barra vertical</option>
-              </select>
-            </details>
-            <button className="primary" disabled={working}>
-              {working ? "Procesando…" : "Cargar y validar archivo"}
-            </button>
-            <small>
-              Sin macros ni enlaces externos. Primera fila no vacía como
-              cabecera. Límite: 100 000 registros, 200 columnas y 20 hojas.
-            </small>
-          </form>
+          <AutoUpload caseId={caseId} />
+          <details>
+            <summary>Carga manual y opciones avanzadas de CSV</summary>
+            <form onSubmit={upload}>
+              <label htmlFor="file">Excel (.xlsx) o CSV · máximo 20 MiB</label>
+              <input
+                id="file"
+                type="file"
+                accept=".csv,.xlsx"
+                ref={uploadRef}
+                required
+                disabled={working}
+              />
+              <details className="csv-options">
+                <summary>Opciones de CSV</summary>
+                <label htmlFor="encoding">Codificación</label>
+                <select
+                  id="encoding"
+                  value={encoding}
+                  onChange={(e) => setEncoding(e.target.value)}
+                >
+                  <option value="auto">UTF-8 o UTF-16 con BOM</option>
+                  <option value="utf-8-sig">UTF-8</option>
+                  <option value="utf-16">UTF-16 con BOM</option>
+                  <option value="cp1252">Windows-1252</option>
+                </select>
+                <label htmlFor="delimiter">Separador</label>
+                <select
+                  id="delimiter"
+                  value={delimiter}
+                  onChange={(e) => setDelimiter(e.target.value)}
+                >
+                  <option value="auto">Detectar y mostrar</option>
+                  <option value=",">Coma</option>
+                  <option value=";">Punto y coma</option>
+                  <option value={"\t"}>Tabulación</option>
+                  <option value="|">Barra vertical</option>
+                </select>
+              </details>
+              <button className="primary" disabled={working}>
+                {working ? "Procesando…" : "Cargar y validar archivo"}
+              </button>
+              <small>
+                Sin macros ni enlaces externos. Primera fila no vacía como
+                cabecera. Límite: 100 000 registros, 200 columnas y 20 hojas.
+              </small>
+            </form>
+          </details>
           <ul className="file-list">
             {files.map((f) => (
               <li key={f.id}>

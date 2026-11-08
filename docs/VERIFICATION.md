@@ -85,3 +85,15 @@ Se centralizaron las sugerencias de encabezados en la API y se agregó reconocim
 **160 pruebas aprobadas**, incluyendo siete pruebas nuevas. La regresión reproduce un export Windows sintético: trece filas, importación incompleta con cero hallazgos y cero reglas evaluables, nueva revisión con mapeo completo y perfil explícito con cuatro hallazgos respaldados. Se verifica que el original y los resultados históricos no cambien; códigos solos, instrucciones en descripciones, fórmulas, columnas ambiguas y destinos mixtos no activan inferencias automáticas.
 
 El dashboard ahora distingue actividad importada, cero coincidencias y ausencia de reglas evaluables. Los cambios también se comprobaron en una revisión local del archivo señalado por el usuario; sus datos y resultados permanecen fuera de Git. Compilación, tipos, Ruff y formato aprobados. No se alteraron reglas ni umbrales para incrementar hallazgos.
+
+## Carga automática y vista azul
+
+Migración 0006, flujo `automatic-1`, consumidor de IA separado y ruta `/cases/{id}/overview`. La portada y el explorador de cada caso ofrecen carga automática; la importación manual se conserva como opción avanzada.
+
+- **172 pruebas aprobadas**: 160 anteriores y doce del flujo automático. Incluyen CSV y XLSX, creación de análisis y todos sus borradores, idempotencia, fechas ambiguas, proveedor indeterminado, archivo modificado, columnas desconocidas, cola llena, pertenencia al caso, Ollama caído, recuperación tras reinicio e importación concurrente mientras el modelo espera.
+- Ruff, formato Python, tipos, compilación de producción y Prettier aprobados. Migraciones hasta 0006 y comprobación de esquema desde SQLite vacío aprobadas; no hay dependencias nuevas.
+- Prueba completa en navegador con CSV exclusivamente sintético: carga desde la portada, navegación automática al caso, trece eventos, cuatro hallazgos (dos Altos y dos Medios), trece evidencias únicas y un grupo de investigación. Sin selección manual de columnas, perfil, fechas ni ejecución individual de IA.
+- Ollama/Qwen3:8b completó las cuatro explicaciones automáticamente. La vista recuperó `4 de 4` listas, sin pendientes ni errores, después de reiniciar los servicios y recargar.
+- La ventana de aproximadamente 714 píxeles se comprobó sin desbordamiento horizontal. Se corrigió la interacción entre los estilos compartidos y la vista adaptable. Captura `.local/automatic-blue-verified.png`, excluida de Git. No se ajustó el viewport para la captura.
+
+No se generó IA automáticamente sobre casos anteriores del usuario durante esta prueba. El flujo nuevo opera sobre la carga que se le solicita. La clasificación conserva las reglas y evidencias existentes; no implica detección universal ni confirmación automática de incidentes. PDF e informe global siguen pendientes.

@@ -46,6 +46,8 @@ Una carga repetida con mismo caso/hash/opciones reutiliza la fuente. Opciones CS
 
 Esta entrega usa una cola local con estados durables en la base de datos, un consumidor y un subproceso lector cancelable. Se eligió este paso previo a Celery para mantener el arranque nativo en Windows sin Redis ni Docker. Ejecutar una sola instancia/proceso de API. Al reiniciar, trabajos pendientes o en ejecución se marcan fallidos para permitir una revisión y un reintento explícitos. No hay recuperación automática ni ejecución distribuida.
 
+El [flujo automático](AUTOMATIC.md) comparte este consumidor para preparar y analizar archivos. Los borradores de IA tienen un consumidor serial separado con estados persistentes; una inferencia en curso no bloquea la lectura de otros archivos.
+
 La infraestructura Celery/Redis de la arquitectura objetivo sigue pendiente. También están pendientes autenticación, autorización multiusuario, cuotas globales, purga/retención y escaneo antivirus. El subproceso lector no es una sandbox de sistema operativo ni impone un límite de RAM mediante el SO. La aplicación se limita a localhost; no publicar ni abrir túneles para datos de clientes. Ningún registro se envía a Ollama en esta fase.
 
 Almacenamiento nativo: `.local/ingestion/`; Compose: volumen privado `ingestion_data`. Ninguna de estas rutas se publica como recurso estático. No subir archivos, filas ni capturas con información de clientes al repositorio.

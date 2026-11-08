@@ -5,6 +5,7 @@ import { api, displayDetails } from "../../../../lib/api";
 import FindingEvidence, { OriginalEvidence } from "./evidence";
 import AIDraft from "./ai-draft";
 import Dashboard from "./dashboard";
+import AssistantSummary from "./assistant-summary";
 import {
   Analysis,
   Coverage,
@@ -87,7 +88,15 @@ function CoverageTable({ rows }: { rows: Coverage[] }) {
   );
 }
 
-export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
+export default function AnalysisWorkspace({
+  caseId,
+  compact = false,
+  initialAnalysisId = "",
+}: {
+  caseId: string;
+  compact?: boolean;
+  initialAnalysisId?: string;
+}) {
   const [title, setTitle] = useState("Investigación");
   const [imports, setImports] = useState<Scope[]>([]);
   const [importsLoading, setImportsLoading] = useState(true);
@@ -191,7 +200,10 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
     let ignore = false;
     loadHistory()
       .then((items) => {
-        if (!ignore) setAnalysisId((current) => current || items[0]?.id || "");
+        if (!ignore)
+          setAnalysisId(
+            (current) => current || initialAnalysisId || items[0]?.id || "",
+          );
       })
       .catch((e) => {
         if (!ignore) setError(e.message);
@@ -199,7 +211,7 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
     return () => {
       ignore = true;
     };
-  }, [loadHistory]);
+  }, [loadHistory, initialAnalysisId]);
   useEffect(() => {
     if (!analysisId) return;
     let disposed = false;
@@ -404,7 +416,10 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
           {error}
         </p>
       )}
-      <div className="analysis-setup">
+      <div
+        className="analysis-setup"
+        style={compact ? { display: "none" } : undefined}
+      >
         <section className="panel">
           <h2>1. Selecciona el alcance</h2>
           <p className="muted">
@@ -1060,7 +1075,7 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                 <summary>Cobertura del análisis completo</summary>
                 <CoverageTable rows={analysis.summary.coverage} />
               </details>
-              <h3>Hallazgos sustentados · vista filtrada</h3>
+              <h3 id="findings">Hallazgos sustentados · vista filtrada</h3>
               {findingsLoading && <p role="status">Recuperando hallazgos…</p>}
               {findingsError && (
                 <p role="alert" className="error">
@@ -1161,7 +1176,12 @@ export default function AnalysisWorkspace({ caseId }: { caseId: string }) {
                   Siguientes
                 </button>
               </div>
-              <h3>Correlación · grupos del análisis completo</h3>
+              {compact && (
+                <AssistantSummary key={analysis.id} analysisId={analysis.id} />
+              )}
+              <h3 id="correlations">
+                Correlación · grupos del análisis completo
+              </h3>
               <p className="muted">
                 No es un conteo de incidentes. Las relaciones por entidad
                 requieren usuario y activo coincidentes; una IP sola no une

@@ -81,7 +81,6 @@ def router_for(engine, jobs, settings):
             raise HTTPException(
                 409, "Solicitud concurrente. Recarga para consultar el borrador."
             ) from exc
-        jobs.queue.put_nowait("draft:" + draft.id)
         return {"draft": output(draft)}
 
     return router

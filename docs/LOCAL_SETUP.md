@@ -4,6 +4,8 @@ Esta fase permite crear/listar casos, importar Excel/CSV y ejecutar reglas de se
 
 ## Este equipo: inicio directo en Windows
 
+Para el flujo habitual, carga el Excel/CSV desde la portada. Se abre el dashboard automáticamente y la IA prepara las explicaciones en segundo plano; ver [AUTOMATIC.md](AUTOMATIC.md). Las columnas o fechas ambiguas muestran una revisión necesaria. Los controles manuales quedan disponibles en Ajustes avanzados.
+
 Los runtimes Node 24, Python 3.12 y Ollama se prepararon de forma local en `.tools/` y `.venv/`. No necesitan agregarse al PATH ni requieren Docker para usar esta fase. Estos binarios no se suben a GitHub; otro equipo debe instalar sus propios runtimes siguiendo las opciones de abajo.
 
 - Abrir `Iniciar-SOC.cmd` desde la raíz para iniciar Ollama, API e interfaz.

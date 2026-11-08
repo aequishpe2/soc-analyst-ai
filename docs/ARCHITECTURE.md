@@ -28,6 +28,8 @@ Fase 3: el motor puro está en apps/api/app/detection, separado de rutas y persi
 
 Dashboard: `apps/api/app/detection/dashboard.py` comparte los filtros con la lista de hallazgos y calcula agregados en la base de datos. La interfaz ofrece selección por gráficos, periodo y entidades; ver [alcance y conteos](DASHBOARD.md). La aprobación humana con historial sigue pendiente.
 
+Flujo automático: `apps/api/app/automatic.py` coordina reconocimiento, importación, detección y solicitud de borradores, con estado persistente en `automatic_runs`. Un consumidor serial de IA separado evita bloquear nuevas importaciones. La vista `/overview` presenta el dashboard y el progreso de todas las explicaciones; ver [AUTOMATIC.md](AUTOMATIC.md). Sigue siendo una instalación de una sola instancia de API.
+
 ## Flujo
 
 ```mermaid

@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import AutoUpload from "../lib/auto-upload";
 
 type Case = { id: string; title: string; created_at: string };
 type System = { ai_status: string; model: string };
@@ -103,13 +104,12 @@ export default function Home() {
           <div>
             <p className="eyebrow">SOC NIVEL 2 · ANÁLISIS DE EVIDENCIAS</p>
             <h1>
-              Cada investigación
-              <br />
-              empieza con evidencia.
+              De tus registros
+              <br />a una investigación.
             </h1>
             <p className="intro">
-              Organiza tus casos y prepara el análisis de los registros de
-              seguridad.
+              Carga el archivo y explora sus hallazgos, evidencias y
+              explicaciones con IA local.
             </p>
           </div>
           <div className="signal" aria-hidden="true">
@@ -135,6 +135,7 @@ export default function Home() {
             </strong>
           </div>
         </div>
+        <AutoUpload />
         <div className="content-grid">
           <section id="cases" className="panel">
             <div className="panel-title">
@@ -191,8 +192,11 @@ export default function Home() {
                       </p>
                       <small>{c.id}</small>
                     </div>
-                    <Link className="secondary" href={`/cases/${c.id}`}>
-                      Abrir caso →
+                    <Link
+                      className="secondary"
+                      href={`/cases/${c.id}/overview`}
+                    >
+                      Ver investigación →
                     </Link>
                   </li>
                 ))}
@@ -260,7 +264,7 @@ export default function Home() {
           </div>
         </section>
         <footer>
-          Motor de reglas disponible · IA e informes en desarrollo.
+          Análisis automático e IA local disponibles.
           <span>Las conclusiones deberán estar sustentadas en registros.</span>
         </footer>
       </main>

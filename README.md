@@ -8,6 +8,8 @@ Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, 
 
 En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://127.0.0.1:3000`. Usar `Detener-SOC.cmd` al terminar. Las herramientas y el modelo se instalan fuera del control de versiones; un clon nuevo requiere seguir la guía de arranque.
 
+Flujo principal: **cargar Excel/CSV → dashboard automático → explicaciones con IA local**. Las columnas y fechas se proponen automáticamente; si hay ambigüedad se pide revisar el formato. La vista azul conserva los gráficos, hallazgos, evidencias y seguimiento de la IA, sin tener que iniciar cada explicación manualmente.
+
 ## Documentación
 
 - [Arranque local y verificaciones](docs/LOCAL_SETUP.md)
@@ -15,6 +17,7 @@ En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://
 - [Detección y correlación: reglas, alcance y límites](docs/DETECTION.md)
 - [IA local: uso, privacidad, validación y límites](docs/AI.md)
 - [Dashboard: gráficos, filtros y significado de los conteos](docs/DASHBOARD.md)
+- [Carga automática: funcionamiento, decisiones y recuperación](docs/AUTOMATIC.md)
 - [Arquitectura y decisiones técnicas](docs/ARCHITECTURE.md)
 - [Contrato analítico, modelo de datos y API](docs/ANALYSIS_SPEC.md)
 - [Plan de desarrollo y criterios de aceptación](docs/ROADMAP.md)

@@ -17,6 +17,7 @@ from starlette.middleware.body_limit import RequestBodyLimitMiddleware
 
 from app.ai import OllamaProvider
 from app.ai_routes import router_for as ai_router
+from app.automatic_routes import router_for as automatic_router
 from app.detection.routes import router_for as detection_router
 from app.ingestion import router_for
 from app.jobs import LocalJobs
@@ -81,6 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(router_for(engine, jobs, storage))
     app.include_router(detection_router(engine, jobs))
     app.include_router(ai_router(engine, jobs, settings))
+    app.include_router(automatic_router(engine, jobs, settings))
     app.add_middleware(RequestBodyLimitMiddleware, max_body_size=20 * 1024 * 1024 + 65536)
     app.add_middleware(
         TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "api", "testserver"]
