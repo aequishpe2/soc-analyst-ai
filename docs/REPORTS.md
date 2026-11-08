@@ -12,7 +12,7 @@ En el caso local verificado, el formato para cliente ocupa **6 páginas frente a
 
 ## Contenido del formato técnico completo
 
-- Portada confidencial, estado de borrador y huella de la instantánea.
+- Portada confidencial y huella de la instantánea.
 - Resumen ejecutivo con registros, hallazgos por criticidad, evidencias únicas y grupos para investigar.
 - Alcance, metodología, fuentes originales y SHA-256 verificado al exportar.
 - Cobertura de cada regla, exclusiones y limitaciones.
@@ -31,7 +31,7 @@ El servidor valida el estado del análisis, pertenencia y cantidad de las refere
 
 La vista previa devuelve una huella del contenido. La descarga enviada desde la interfaz exige esa misma huella: si termina una explicación IA entre ambos pasos, responde 409 y solicita actualizar la vista previa. La huella identifica el contenido analítico; los datos de portada y el instante de exportación pueden variar. No es una firma digital. La respuesta PDF lleva además su SHA-256 y la huella de la instantánea en las cabeceras de la API.
 
-Los informes son **borradores con revisión humana pendiente**. La aplicación todavía no registra una aprobación del analista. Contención y remediación son propuestas condicionadas a validar contexto y autorización. No se confirma impacto ni se asigna un número de incidentes automáticamente.
+Los PDF muestran una leyenda neutral de **Confidencial**, sin la etiqueta de borrador o revisión pendiente. La aplicación todavía no registra una aprobación del analista: retirar esa leyenda no acredita una revisión. Contención y remediación son propuestas condicionadas a validar contexto y autorización. No se confirma impacto ni se asigna un número de incidentes automáticamente.
 
 Límites de esta primera versión: 2000 hallazgos, 20 000 referencias, 20 MiB de contenido y 20 MiB de PDF. Si se superan, se pide reducir el alcance; no se recortan hallazgos silenciosamente. La generación es síncrona, en un hilo del servidor; el proxy espera hasta 30 segundos. No se ha validado el rendimiento en el máximo admitido. Para investigaciones muy grandes queda pendiente una cola dedicada de exportación.
 

@@ -88,7 +88,7 @@ def render_client_pdf(data, metadata):
     counts = Counter(f["data"]["severity"] for f in findings)
     add("INFORME DE SEGURIDAD", title)
     add(data["title"], heading)
-    add("Confidencial | Borrador - REVISIÓN HUMANA PENDIENTE", small)
+    add("Confidencial", small)
     fields = [
         ("Cliente", metadata.client),
         ("Analista", metadata.analyst),

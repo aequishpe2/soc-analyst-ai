@@ -130,7 +130,7 @@ export default function TechnicalReport({
           <p className="eyebrow">DOCUMENTACIÓN DEL CASO</p>
           <h3>Informe técnico de seguridad</h3>
         </div>
-        <span className="badge">REVISIÓN HUMANA PENDIENTE</span>
+        <span className="badge">CONFIDENCIAL</span>
       </div>
       <p className="muted">
         Resumen ejecutivo, hallazgos, criticidad justificada, impacto posible,
@@ -335,7 +335,7 @@ export default function TechnicalReport({
             {busy ? "Generando PDF…" : "Descargar informe PDF"}
           </button>
           <p className="muted">
-            El documento se descarga como borrador confidencial. Si el contenido
+            El documento se descarga como informe confidencial. Si el contenido
             cambia mientras termina la IA, actualiza la vista previa antes de
             exportar.
           </p>

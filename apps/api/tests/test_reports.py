@@ -53,7 +53,7 @@ def test_full_report_evidence_and_spanish_pdf(client):
         "Correlaciones",
         "Recomendaciones generales",
         "Anexo de evidencias",
-        "REVISIÓN HUMANA PENDIENTE",
+        "CONFIDENCIAL",
         preview["sources"][0]["sha256"],
         "alice",
         "server-1",
@@ -63,6 +63,9 @@ def test_full_report_evidence_and_spanish_pdf(client):
     for finding in preview["findings"]:
         assert finding["id"] in text
         assert finding["data"]["title"] in text
+    assert "REVISIÓN HUMANA PENDIENTE" not in text
+    assert "Borrador" not in text
+    assert "BORRADOR" not in text
     for evidence in preview["evidence"]:
         assert evidence["id"] in text
     assert response.headers["cache-control"] == "no-store"
@@ -191,7 +194,9 @@ def test_client_report_is_default_and_retains_all_findings_and_row_locations(cli
         PdfReader(io.BytesIO(technical.content)).pages
     )
     assert "Anexo de evidencias" not in text
-    assert "REVISIÓN HUMANA PENDIENTE" in text
+    assert "Confidencial" in text
+    assert "REVISIÓN HUMANA PENDIENTE" not in text
+    assert "Borrador" not in text
     assert data["sources"][0]["sha256"] in text
     for finding in data["findings"]:
         assert finding["label"] in text

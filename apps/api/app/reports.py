@@ -279,7 +279,7 @@ def render_pdf(data, metadata):
     story.append(Spacer(1, 16 * mm))
     add("Investigación de registros SIEM", "ReportTitle")
     add(data["title"], "ReportHeading")
-    add("BORRADOR TÉCNICO - REVISIÓN HUMANA PENDIENTE")
+    add("CONFIDENCIAL")
     for label, value in (
         ("Cliente", metadata.client),
         ("Analista", metadata.analyst),
@@ -433,7 +433,7 @@ def render_pdf(data, metadata):
             )
         if metadata.include_ai and finding["ai"]:
             ai = finding["ai"]
-            add("Apoyo de IA local - borrador validado estructuralmente", "ReportHeading")
+            add("Apoyo de IA local - explicación validada estructuralmente", "ReportHeading")
             details(ai["result"].get("explanation", []))
             add(f"Modelo: {ai['model']} | Versión: {ai['version']}", "ReportSmall")
             add(f"Digest: {ai['digest']} | Entrada: {ai['input_hash']}", "ReportSmall")
@@ -510,7 +510,7 @@ def render_pdf(data, metadata):
         canvas.line(20 * mm, 17 * mm, 190 * mm, 17 * mm)
         canvas.setFont("Helvetica", 8)
         canvas.setFillColor(colors.HexColor("#475569"))
-        canvas.drawString(20 * mm, 12 * mm, "SOC Analyst AI | Confidencial | Borrador")
+        canvas.drawString(20 * mm, 12 * mm, "SOC Analyst AI | Confidencial")
         canvas.drawRightString(190 * mm, 12 * mm, f"Página {doc.page}")
         canvas.restoreState()
 
