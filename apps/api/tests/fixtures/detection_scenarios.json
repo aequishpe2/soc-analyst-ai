@@ -1,0 +1,16 @@
+{
+  "description": "Catálogo sintético de condiciones; no representa precisión con logs reales.",
+  "cases": [
+    {"name":"administracion_benigna","series":[{"count":1,"values":{"event_type":"process","command":"powershell -Command Get-Service"}}],"expected":[]},
+    {"name":"fallos_bajo_umbral","series":[{"count":3}],"expected":[]},
+    {"name":"fallos_seguidos_de_exito","series":[{"count":10},{"count":1,"start":20,"values":{"result":"success"}}],"expected":["brute_force","success_after_failures"]},
+    {"name":"fallos_varias_cuentas","series":[{"count":10,"values":{"user":"account_{i}"}}],"expected":["password_spraying"]},
+    {"name":"accesos_remotos_varios_destinos","series":[{"count":3,"values":{"event_type":"remote_login","result":"success","destination_host":"server_{i}"}}],"expected":["lateral_movement"]},
+    {"name":"grupo_privilegiado_explicito","series":[{"count":1,"values":{"event_type":"group_member_added","result":"success","target_group":"Administrators"}}],"expected":["privilege_change"]},
+    {"name":"borrado_de_auditoria_explicito","series":[{"count":1,"values":{"event_type":"audit_log_cleared","result":"success"}}],"expected":["control_tampering"]},
+    {"name":"comando_con_argumento_codificado","series":[{"count":1,"values":{"event_type":"process","result":null,"command":"powershell -EncodedCommand AAA"}}],"expected":["suspicious_command"]},
+    {"name":"fin_del_horario","settings":{"business_hours":{"timezone":"UTC","weekdays":[0],"start":"08:00","end":"09:00"}},"series":[{"count":1,"start":0,"values":{"result":"success"}}],"expected":["outside_hours"]},
+    {"name":"copias_no_inflan_umbral","series":[{"count":20,"step":0}],"expected":[]},
+    {"name":"cuenta_excluida_por_contexto","settings":{"excluded_users":["alice"]},"series":[{"count":10}],"expected":[]}
+  ]
+}

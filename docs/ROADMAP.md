@@ -2,7 +2,7 @@
 
 Las fases están ordenadas por dependencias. Ninguna funcionalidad se considera entregada solo por tener una pantalla.
 
-Estado actual: base local e importación implementadas y verificadas con SQLite y archivos sintéticos. Pendientes la validación de Compose/PostgreSQL y el worker distribuido de la arquitectura objetivo. Ver INGESTION.md y VERIFICATION.md. La siguiente fase funcional es el motor de detección.
+Estado actual: base local, importación y motor determinista implementados y verificados con SQLite y datos sintéticos. Pendientes Compose/PostgreSQL, validación de rendimiento máximo y worker distribuido. Ver INGESTION.md, DETECTION.md y VERIFICATION.md. La siguiente fase es ampliar el dashboard y la revisión humana auditable.
 
 ## 1. Base ejecutable
 

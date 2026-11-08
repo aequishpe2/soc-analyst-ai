@@ -1,7 +1,6 @@
 """Single-process local queue. Durable states, atomic imports, isolated parser with timeout."""
 
 import asyncio
-import hashlib
 import json
 import logging
 import subprocess
@@ -13,17 +12,10 @@ from pathlib import Path
 from sqlalchemy import insert, inspect, select
 from sqlalchemy.orm import Session
 
-from app.models import Event, ImportRun, Job, RowIssue, SourceFile
+from app.detection.service import execute_analysis
+from app.fingerprints import config_digest, digest_file
+from app.models import Analysis, Event, ImportRun, Job, RowIssue, SourceFile
 from app.normalization import normalize
-
-
-def digest_file(path):
-    with path.open("rb") as source:
-        return hashlib.file_digest(source, "sha256").hexdigest()
-
-
-def config_digest(config):
-    return hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()
 
 
 class LocalJobs:
@@ -46,6 +38,12 @@ class LocalJobs:
                 job.error = "Trabajo interrumpido al reiniciar. Puedes reintentarlo."
                 if job.kind == "inspect":
                     db.get(SourceFile, job.file_id).status = "failed"
+            if inspect(self.engine).has_table("analyses"):
+                for analysis in db.scalars(
+                    select(Analysis).where(Analysis.status.in_(["queued", "running"]))
+                ):
+                    analysis.status = "failed"
+                    analysis.error = "Análisis interrumpido al reiniciar. Puedes reintentarlo."
             db.commit()
         self.task = asyncio.create_task(self.consume())
 
@@ -71,6 +69,9 @@ class LocalJobs:
                 self.queue.task_done()
 
     def execute(self, job_id):
+        if job_id.startswith("analysis:"):
+            execute_analysis(self.engine, self.storage, job_id.split(":", 1)[1])
+            return
         with Session(self.engine) as db:
             job = db.get(Job, job_id)
             job.status = "running"

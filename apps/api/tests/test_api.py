@@ -39,7 +39,7 @@ def test_ollama_offline_is_not_analysis_failure(client, monkeypatch):
     monkeypatch.setattr(httpx.AsyncClient, "get", offline)
     data = client.get("/api/v1/system").json()
     assert data["ai_status"] == "unavailable"
-    assert data["analysis_available"] is False
+    assert data["analysis_available"] is True
     assert client.get("/health/ready").status_code == 200
 
 

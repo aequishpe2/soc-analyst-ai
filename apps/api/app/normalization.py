@@ -14,6 +14,11 @@ FIELDS = (
     "process",
     "command",
     "provider_event_id",
+    "event_provider",
+    "logon_type",
+    "target_group",
+    "target_user",
+    "privilege",
 )
 DATE_FORMATS = ("iso8601", "dmy", "mdy", "epoch_seconds", "epoch_milliseconds")
 

@@ -14,6 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette.middleware.body_limit import RequestBodyLimitMiddleware
 
+from app.detection.routes import router_for as detection_router
 from app.ingestion import router_for
 from app.jobs import LocalJobs
 from app.models import Case
@@ -72,6 +73,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.engine = engine
     app.state.jobs = jobs
     app.include_router(router_for(engine, jobs, storage))
+    app.include_router(detection_router(engine, jobs))
     app.add_middleware(RequestBodyLimitMiddleware, max_body_size=20 * 1024 * 1024 + 65536)
     app.add_middleware(
         TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "api", "testserver"]
@@ -107,7 +109,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.get("/health/ready")
     def ready(db: Annotated[Session, Depends(session)]):
-        db.execute(text("SELECT id FROM events LIMIT 1"))
+        db.execute(text("SELECT id FROM analyses LIMIT 1"))
         return {"status": "ready"}
 
     @app.get("/api/v1/system")
@@ -130,7 +132,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "provider": "ollama",
             "model": settings.ai_model,
             "ai_status": state,
-            "analysis_available": False,
+            "analysis_available": True,
         }
 
     @app.post("/api/v1/cases", response_model=CaseOutput, status_code=201)

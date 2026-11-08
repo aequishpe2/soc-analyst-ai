@@ -696,3 +696,188 @@ table small {
     flex-direction: column;
   }
 }
+/* Deterministic security investigations */
+.analysis-setup {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(0, 1.4fr);
+  gap: 22px;
+  margin: 28px 0;
+}
+.scope-list {
+  max-height: 400px;
+  overflow: auto;
+}
+.scope-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 13px;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.scope-option input {
+  width: auto;
+  accent-color: var(--accent);
+  flex: none;
+  margin-top: 3px;
+}
+.scope-option span {
+  min-width: 0;
+}
+.scope-option small,
+.scope-option code {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.analysis-main summary {
+  cursor: pointer;
+  font-size: 12px;
+  padding: 12px 0;
+  color: var(--accent);
+}
+.analysis-main textarea {
+  background: #0b121b;
+  border: 1px solid #364455;
+  border-radius: 5px;
+  color: var(--ink);
+  font: inherit;
+  min-height: 90px;
+  resize: vertical;
+  padding: 10px;
+  width: 100%;
+  max-width: 100%;
+}
+.analysis-main textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.analysis-main label {
+  display: block;
+}
+.analysis-main .confirm {
+  display: flex;
+}
+.weekdays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.weekdays label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.weekdays input {
+  width: auto;
+  accent-color: var(--accent);
+}
+.analysis-results {
+  margin: 30px 0;
+}
+.analysis-results p,
+.analysis-results li {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.analysis-results > h3 {
+  margin-top: 32px;
+  font-size: 18px;
+}
+.finding-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 18px;
+  margin: 20px 0;
+}
+.finding-filters > div {
+  flex: 1;
+  min-width: 170px;
+}
+.finding-card,
+.group-card {
+  border: 1px solid var(--line);
+  padding: 20px;
+  border-radius: 7px;
+  margin: 18px 0;
+  background: #0d151e;
+}
+.finding-card h4,
+.group-card h4 {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 10px 0;
+}
+.finding-card .panel-title {
+  gap: 18px;
+  align-items: flex-start;
+}
+.risk {
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  background: #24372f;
+  color: #b4efce;
+}
+.risk-alto {
+  background: #432d22;
+  color: #ffbe8b;
+}
+.risk-medio {
+  background: #3e361e;
+  color: #efda8b;
+}
+.risk-crítico {
+  background: #48252d;
+  color: #ffacba;
+}
+.observed-data {
+  background: #080f16;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 14px;
+  font-size: 11px;
+  line-height: 1.7;
+  overflow: auto;
+  max-height: 340px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.analysis-results .import-stats {
+  grid-template-columns: repeat(5, 1fr);
+}
+.analysis-main button {
+  transition: background 0.15s;
+}
+.analysis-main .secondary:hover {
+  background: #19312e;
+}
+@media (max-width: 1000px) {
+  .analysis-setup {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .analysis-results .import-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .analysis-results .panel-title {
+    flex-wrap: wrap;
+  }
+  .finding-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .analysis-main header {
+    gap: 12px;
+  }
+  .analysis-main .badge {
+    white-space: normal;
+  }
+}

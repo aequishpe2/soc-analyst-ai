@@ -82,6 +82,11 @@ const fields = [
   ["process", "Proceso"],
   ["command", "Comando"],
   ["provider_event_id", "ID de evento del SIEM"],
+  ["event_provider", "Proveedor del evento"],
+  ["logon_type", "Tipo de inicio de sesión (Windows)"],
+  ["target_group", "Grupo de destino"],
+  ["target_user", "Cuenta afectada o miembro añadido"],
+  ["privilege", "Privilegio o rol asignado"],
 ];
 const aliases: Record<string, string[]> = {
   timestamp: [
@@ -96,13 +101,18 @@ const aliases: Record<string, string[]> = {
   user: ["user", "usuario", "username", "account"],
   source_ip: ["source_ip", "src_ip", "ip_origen"],
   destination_ip: ["destination_ip", "dst_ip", "ip_destino"],
-  source_host: ["source_host", "src_host", "host"],
+  source_host: ["source_host", "src_host"],
   destination_host: ["destination_host", "dst_host"],
   event_type: ["event_type", "evento", "event"],
   result: ["result", "resultado", "outcome", "status"],
   process: ["process", "proceso", "process_name"],
   command: ["command", "comando", "commandline", "command_line"],
   provider_event_id: ["event_id", "eventid"],
+  event_provider: ["provider", "providername", "event_provider"],
+  logon_type: ["logon_type", "logontype"],
+  target_group: ["target_group", "targetgroup", "groupname", "targetgroupname"],
+  target_user: ["target_user", "targetusername", "membername"],
+  privilege: ["privilege", "privileges", "role"],
 };
 function suggest(sheet: Sheet) {
   const mapping: Record<string, string> = {};
@@ -399,7 +409,9 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
     <main className="import-main">
       <header>
         <Link href="/">← Investigaciones</Link>
-        <span className="badge">EVIDENCIA LOCAL</span>
+        <Link className="secondary" href={`/cases/${caseId}/analysis`}>
+          Análisis de seguridad →
+        </Link>
       </header>
       <section className="heading">
         <div>
@@ -411,8 +423,8 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
         </div>
       </section>
       <p className="info-note">
-        Esta fase importa evidencias. Todavía no detecta incidentes ni envía
-        registros a la IA.
+        Importa y revisa los eventos antes de evaluar las versiones desde
+        Análisis de seguridad. Los registros no se envían a la IA en esta fase.
       </p>
       {error && (
         <p role="alert" className="error">
@@ -930,8 +942,8 @@ export default function ImportWorkspace({ caseId }: { caseId: string }) {
         </section>
       )}
       <footer>
-        Los archivos permanecen en este equipo. No se han generado hallazgos de
-        seguridad.
+        Los archivos permanecen en este equipo. Los hallazgos se consultan en
+        Análisis de seguridad.
       </footer>
     </main>
   );

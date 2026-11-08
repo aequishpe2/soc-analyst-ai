@@ -2,7 +2,7 @@
 
 Estado: especificación; umbrales iniciales sujetos a evaluación con datos sintéticos y contexto del cliente.
 
-Para el contrato efectivo de carga/importación de la fase 2, consultar INGESTION.md. Las rutas de análisis, informes, purga y autorización multiusuario de esta propuesta siguen pendientes.
+Para los contratos efectivos, consultar INGESTION.md y DETECTION.md. El motor y sus rutas de análisis ya están implementados; informes, revisión auditable, purga y autorización multiusuario siguen pendientes.
 
 ## Entidades
 

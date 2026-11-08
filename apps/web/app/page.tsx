@@ -263,7 +263,7 @@ export default function Home() {
             {[
               ["01", "Preparar", "Crear y organizar casos", true],
               ["02", "Importar", "Excel y CSV", true],
-              ["03", "Investigar", "Reglas e IA · Próximamente", false],
+              ["03", "Investigar", "Reglas con evidencias", true],
               ["04", "Informar", "Informe PDF · Próximamente", false],
             ].map(([n, t, d, active]) => (
               <div key={String(n)} className={active ? "step active" : "step"}>
@@ -275,7 +275,7 @@ export default function Home() {
           </div>
         </section>
         <footer>
-          Importación disponible · El análisis de seguridad sigue en desarrollo.
+          Motor de reglas disponible · IA e informes en desarrollo.
           <span>Las conclusiones deberán estar sustentadas en registros.</span>
         </footer>
       </main>

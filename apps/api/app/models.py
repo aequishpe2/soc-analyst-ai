@@ -87,3 +87,57 @@ class RowIssue(Base):
     row: Mapped[int] = mapped_column(Integer)
     line_end: Mapped[int] = mapped_column(Integer)
     reason: Mapped[str] = mapped_column(String(200))
+
+
+class Analysis(Base):
+    __tablename__ = "analyses"
+    __table_args__ = (UniqueConstraint("case_id", "config_hash"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    case_id: Mapped[str] = mapped_column(ForeignKey("cases.id"), index=True)
+    config_hash: Mapped[str] = mapped_column(String(64))
+    config: Mapped[dict] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(String(20), default="queued")
+    input_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    summary: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    error: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )
+
+
+class AnalysisScope(Base):
+    __tablename__ = "analysis_scopes"
+    analysis_id: Mapped[str] = mapped_column(ForeignKey("analyses.id"), primary_key=True)
+    import_id: Mapped[str] = mapped_column(ForeignKey("import_runs.id"), primary_key=True)
+
+
+class InvestigationGroup(Base):
+    __tablename__ = "investigation_groups"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    analysis_id: Mapped[str] = mapped_column(ForeignKey("analyses.id"), index=True)
+    payload: Mapped[dict] = mapped_column(JSON)
+
+
+class Finding(Base):
+    __tablename__ = "findings"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    analysis_id: Mapped[str] = mapped_column(ForeignKey("analyses.id"), index=True)
+    group_id: Mapped[str] = mapped_column(ForeignKey("investigation_groups.id"), index=True)
+    rule_id: Mapped[str] = mapped_column(String(50))
+    severity: Mapped[str] = mapped_column(String(10), index=True)
+    confidence: Mapped[str] = mapped_column(String(20))
+    payload: Mapped[dict] = mapped_column(JSON)
+
+
+class FindingEvidence(Base):
+    __tablename__ = "finding_evidence"
+    finding_id: Mapped[str] = mapped_column(ForeignKey("findings.id"), primary_key=True)
+    event_id: Mapped[str] = mapped_column(ForeignKey("events.id"), primary_key=True)
+    role: Mapped[str] = mapped_column(String(30))
+
+
+class AnalysisDuplicate(Base):
+    __tablename__ = "analysis_duplicates"
+    analysis_id: Mapped[str] = mapped_column(ForeignKey("analyses.id"), primary_key=True)
+    event_id: Mapped[str] = mapped_column(ForeignKey("events.id"), primary_key=True)
+    representative_id: Mapped[str] = mapped_column(ForeignKey("events.id"))

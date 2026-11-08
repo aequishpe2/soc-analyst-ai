@@ -1,6 +1,6 @@
 # Arquitectura propuesta
 
-Estado: diseño para la primera versión. Los casos, diagnóstico local e importación están implementados; consultar LOCAL_SETUP.md, INGESTION.md y VERIFICATION.md para el alcance comprobado.
+Estado: diseño para la primera versión. Casos, diagnóstico local, importación y motor determinista están implementados; consultar LOCAL_SETUP.md, INGESTION.md, DETECTION.md y VERIFICATION.md.
 
 ## Objetivo y límites
 
@@ -23,6 +23,8 @@ Una aplicación para investigar archivos SIEM de un cliente por caso, con eviden
 Fijar versiones soportadas y lockfiles al implementar; revisar avisos de seguridad antes de instalarlas. Redis no será la fuente de verdad. Las tareas serán idempotentes, con estado persistente, límites y reintentos acotados.
 
 Implementación intermedia de fase 2: la instalación nativa usa cola local con estados persistentes y un lector en subproceso, sin Celery/Redis. Solo admite una instancia de API. Los motivos, límites y recuperación están documentados en INGESTION.md; el worker distribuido sigue siendo parte de la arquitectura objetivo.
+
+Fase 3: el motor puro está en apps/api/app/detection, separado de rutas y persistencia. Analiza importaciones explícitas y conserva configuración, hashes, cobertura, grupos y referencias en tablas separadas. El trabajo comparte la cola local y corre fuera del bucle HTTP; la IA no participa en las detecciones actuales.
 
 ## Flujo
 

@@ -36,3 +36,15 @@ La infraestructura incluye CI para comprobaciones y escaneo de secretos. Su conf
 - HTTP a través del proxy real: 4 registros sintéticos aceptados, 2 sin hora UTC válida, duplicado preservado, evidencia multilínea y SHA-256 verificados; escritura con origen externo rechazada (403).
 
 No se midió el rendimiento máximo de 100 000 registros ni se probó esta fase en PostgreSQL/Compose. El lector impone límites y un timeout, pero no es una sandbox de SO ni limita RAM a nivel del sistema. Consultar INGESTION.md para los límites y el alcance local de la cola.
+
+## Detección y correlación (fase 3)
+
+- Motor determinista 1.0.1, catálogo soc-local-1, normalización ampliada versión 2. Sin nuevas dependencias ni envío de registros al modelo.
+- 106 pruebas aprobadas en la suite completa. Cubren las ocho reglas, umbrales y ventanas inclusivas, orden temporal estricto, calendarios, falsos positivos administrativos, semántica Windows, campos ausentes, contradicciones, fuentes sin identidad válida, exclusiones, duplicados, determinismo y cierre de evidencias dentro del alcance.
+- Pruebas de persistencia: fallos al insertar evidencias revierten grupos/hallazgos; referencias externas o hallazgos sin evidencia se rechazan; fuentes modificadas bloquean el análisis; los trabajos interrumpidos se recuperan mediante reintento; dos lecturas del mismo original no pueden combinarse.
+- Catálogo sintético etiquetado de 11 escenarios: 8 coincidencias de regla esperadas, 0 coincidencias adicionales y 0 omisiones (precisión/recobrado 1.0 únicamente en ese catálogo). No es una medición de precisión general ni validación con incidentes reales.
+- Next.js, TypeScript, Ruff y formato aprobados. La migración 0003 se verificó desde una base vacía y se aplicó a la instalación local sin diferencias con los modelos.
+- API/proxy real: caso de demostración separado, 29 registros de origen, 28 distinguibles, 1 copia preservada, 8 hallazgos y 4 grupos; distribución Crítico 0, Alto 4, Medio 3, Bajo 1. Referencias, hashes y pertenencia al alcance verificadas; origen externo de escritura rechazado.
+- Navegador: selección de alcance/calendario, ejecución, filtros Alto + éxito tras fallos, apertura del hallazgo y consulta del registro original de éxito con SHA-256 verificadas. Los datos de prueba y las capturas permanecen en .local, fuera de Git.
+
+Los cuatro grupos de demostración no se presentan como cuatro incidentes. No se realizaron análisis automáticos sobre los archivos del usuario. Siguen pendientes PostgreSQL/Compose, rendimiento máximo, fuentes SIEM adicionales, revisión humana auditable, gráficos avanzados, agente de IA e informe PDF. GitHub Actions está configurado, pero no se reporta una ejecución remota como aprobada sin haberla observado.

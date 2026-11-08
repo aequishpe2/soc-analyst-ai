@@ -1,10 +1,10 @@
 # SOC Analyst AI
 
-Aplicación web planificada para apoyar a analistas SOC Nivel 2 en el análisis de registros exportados de un SIEM en Excel (.xlsx) y CSV, sin integración directa con el SIEM.
+Aplicación web local en desarrollo para apoyar a analistas SOC Nivel 2 con registros exportados de un SIEM en Excel (.xlsx) y CSV, sin integración directa con el SIEM.
 
 ## Estado
 
-Implementado: casos, carga segura de Excel/CSV, vista previa, mapeo, importaciones versionadas y consulta de evidencias con trazabilidad. Ollama/Qwen3 están preparados localmente. Las detecciones, la revisión IA, el dashboard de riesgos y el PDF siguen pendientes.
+Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, ocho reglas deterministas, cobertura, filtros de hallazgos y grupos de investigación con evidencias trazables. Ollama/Qwen3 están preparados localmente. Siguen pendientes la revisión humana con cambios auditados, los gráficos del dashboard, el agente de IA y el PDF.
 
 En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://127.0.0.1:3000`. Usar `Detener-SOC.cmd` al terminar. Las herramientas y el modelo se instalan fuera del control de versiones; un clon nuevo requiere seguir la guía de arranque.
 
@@ -12,6 +12,7 @@ En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://
 
 - [Arranque local y verificaciones](docs/LOCAL_SETUP.md)
 - [Importación: uso, límites y garantías](docs/INGESTION.md)
+- [Detección y correlación: reglas, alcance y límites](docs/DETECTION.md)
 - [Arquitectura y decisiones técnicas](docs/ARCHITECTURE.md)
 - [Contrato analítico, modelo de datos y API](docs/ANALYSIS_SPEC.md)
 - [Plan de desarrollo y criterios de aceptación](docs/ROADMAP.md)

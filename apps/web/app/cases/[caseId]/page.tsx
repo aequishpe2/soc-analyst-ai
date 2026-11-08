@@ -5,5 +5,5 @@ export default async function CasePage({
   params: Promise<{ caseId: string }>;
 }) {
   const { caseId } = await params;
-  return <ImportWorkspace caseId={caseId} />;
+  return <ImportWorkspace key={caseId} caseId={caseId} />;
 }
