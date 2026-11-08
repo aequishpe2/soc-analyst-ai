@@ -2,7 +2,15 @@
 
 Desde el dashboard, abrir **Informe técnico → Preparar informe**. Revisar el resumen, fuentes, cobertura, hallazgos y anexo. Los datos de analista, cliente, consultora y referencia son opcionales; nunca se deducen de los registros. Pulsar **Descargar informe PDF**. Funciona también desde la pantalla de análisis avanzado.
 
-## Contenido
+## Formatos de descarga
+
+**Para cliente · conciso** es el formato predeterminado desde la versión `technical-report-2`. Presenta resumen ejecutivo, todos los hallazgos con criticidad justificada, impacto posible, limitaciones y acciones, correlaciones, cobertura resumida, recomendaciones y fuentes verificadas. Cada hallazgo cita archivo, hoja y filas de evidencia. Los rangos solo agrupan filas consecutivas existentes; no incluyen huecos. Evita portada aislada, explicaciones repetidas, configuración interna y volcado de cada celda. No elimina hallazgos ni cambia la clasificación. Los caracteres fuera de Latin-1 se representan como `[U+XXXX]`, igual que en el formato técnico.
+
+**Técnico completo · con anexo de registros** conserva el detalle ampliado descrito abajo y la opción de incluir explicaciones IA. El formato para cliente resume los hechos del motor; las explicaciones ampliadas de IA permanecen en la aplicación y en el formato técnico. La vista previa permite consultar el detalle completo con cualquiera de los dos formatos.
+
+En el caso local verificado, el formato para cliente ocupa **6 páginas frente a 56**, conservando los 20 hallazgos y las referencias a las 80 evidencias. La extensión depende del caso; no se impone un límite de páginas que recorte resultados.
+
+## Contenido del formato técnico completo
 
 - Portada confidencial, estado de borrador y huella de la instantánea.
 - Resumen ejecutivo con registros, hallazgos por criticidad, evidencias únicas y grupos para investigar.
@@ -33,8 +41,8 @@ No se persiste el PDF en el servidor al descargar: el usuario conserva la copia 
 
 ## API
 
-- `GET /api/v1/analyses/{id}/report`: instantánea completa para vista previa, versión `technical-report-1` y `snapshot_hash`.
-- `POST /api/v1/analyses/{id}/report/pdf`: descarga binaria. JSON opcional por campos: `analyst`, `client`, `organization`, `reference`, `include_ai` (por defecto true), `snapshot_hash`. El cuerpo JSON es obligatorio; usar `{}` para los valores por defecto. Si se proporciona la huella, debe coincidir.
+- `GET /api/v1/analyses/{id}/report`: instantánea completa para vista previa, versión `technical-report-2` y `snapshot_hash`.
+- `POST /api/v1/analyses/{id}/report/pdf`: descarga binaria. JSON opcional por campos: `analyst`, `client`, `organization`, `reference`, `format` (`client` por defecto o `technical`), `include_ai` (por defecto true; aplicable al formato técnico), `snapshot_hash`. El cuerpo JSON es obligatorio; usar `{}` para los valores por defecto. Si se proporciona la huella, debe coincidir.
 
 El proxy web admite únicamente estas rutas adicionales, conserva la comprobación de origen para POST, limita la respuesta binaria y fija el tipo y nombre de descarga.
 

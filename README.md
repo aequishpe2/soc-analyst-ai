@@ -10,6 +10,8 @@ En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://
 
 Flujo principal: **cargar Excel/CSV → dashboard automático → explicaciones con IA local → informe técnico y PDF**. Las columnas y fechas se proponen automáticamente; si hay ambigüedad se pide revisar el formato. La vista azul conserva los gráficos, hallazgos, evidencias y seguimiento de la IA, sin tener que iniciar cada explicación manualmente.
 
+La descarga ofrece un **informe conciso para cliente**, seleccionado por defecto, y un **informe técnico completo con anexo**. Ambos conservan todos los hallazgos; el primero resume las evidencias mediante referencias a archivo, hoja y filas.
+
 ## Documentación
 
 - [Arranque local y verificaciones](docs/LOCAL_SETUP.md)

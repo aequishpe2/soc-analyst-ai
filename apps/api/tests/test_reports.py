@@ -21,7 +21,7 @@ def pdf_text(response):
     assert response.headers["content-type"] == "application/pdf"
     assert response.content.startswith(b"%PDF-")
     reader = PdfReader(io.BytesIO(response.content))
-    assert len(reader.pages) > 2
+    assert len(reader.pages) >= 1
     return "\n".join(page.extract_text() for page in reader.pages)
 
 
@@ -34,7 +34,12 @@ def test_full_report_evidence_and_spanish_pdf(client):
     assert len(preview["snapshot_hash"]) == 64
     assert client.get(path).json()["snapshot_hash"] == preview["snapshot_hash"]
     response = client.post(
-        path + "/pdf", json={"analyst": "Ángela Muñoz", "snapshot_hash": preview["snapshot_hash"]}
+        path + "/pdf",
+        json={
+            "format": "technical",
+            "analyst": "Ángela Muñoz",
+            "snapshot_hash": preview["snapshot_hash"],
+        },
     )
     text = pdf_text(response)
     for required in (
@@ -110,10 +115,15 @@ def test_ai_snapshot_change_requires_preview_and_can_be_excluded(client, monkeyp
     after = client.get(report_path).json()
     assert sum(bool(f["ai"]) for f in after["findings"]) == 1
     with_ai = pdf_text(
-        client.post(report_path + "/pdf", json={"snapshot_hash": after["snapshot_hash"]})
+        client.post(
+            report_path + "/pdf",
+            json={"format": "technical", "snapshot_hash": after["snapshot_hash"]},
+        )
     )
     assert "Apoyo de IA local" in with_ai
-    without_ai = pdf_text(client.post(report_path + "/pdf", json={"include_ai": False}))
+    without_ai = pdf_text(
+        client.post(report_path + "/pdf", json={"format": "technical", "include_ai": False})
+    )
     assert "Apoyo de IA local" not in without_ai
 
 
@@ -127,7 +137,8 @@ def test_long_untrusted_values_render_as_literal_text(client):
         }
         db.commit()
     response = client.post(
-        f"/api/v1/analyses/{analysis['id']}/report/pdf", json={"client": "<b>Cliente</b>"}
+        f"/api/v1/analyses/{analysis['id']}/report/pdf",
+        json={"format": "technical", "client": "<b>Cliente</b>"},
     )
     text = pdf_text(response)
     assert "<b>Cliente</b>" in text
@@ -167,3 +178,30 @@ def test_no_findings_report_stays_explicit_about_uncertainty(client):
     text = pdf_text(response)
     assert "No se detectaron hallazgos" in text
     assert "no demuestra ausencia de compromiso" in text
+
+
+def test_client_report_is_default_and_retains_all_findings_and_row_locations(client):
+    analysis, _ = completed(client)
+    path = f"/api/v1/analyses/{analysis['id']}/report"
+    data = client.get(path).json()
+    concise = client.post(path + "/pdf", json={})
+    text = pdf_text(concise)
+    technical = client.post(path + "/pdf", json={"format": "technical"})
+    assert len(PdfReader(io.BytesIO(concise.content)).pages) < len(
+        PdfReader(io.BytesIO(technical.content)).pages
+    )
+    assert "Anexo de evidencias" not in text
+    assert "REVISIÓN HUMANA PENDIENTE" in text
+    assert data["sources"][0]["sha256"] in text
+    for finding in data["findings"]:
+        assert finding["label"] in text
+        assert finding["data"]["title"] in text
+        assert finding["data"]["severity_reason"] in text
+    assert "filas 2-12" in text
+    assert client.post(path + "/pdf", json={"format": "unknown"}).status_code == 422
+
+
+def test_row_range_compression_does_not_imply_evidence_in_gaps():
+    from app.client_report import row_ranges
+
+    assert row_ranges([10, 2, 3, 4, 10, 12, 13]) == "2-4, 10, 12-13"

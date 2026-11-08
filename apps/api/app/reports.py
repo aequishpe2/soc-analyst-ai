@@ -7,6 +7,7 @@ import uuid
 from collections import Counter
 from datetime import datetime
 from html import escape
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, ConfigDict, Field
@@ -24,6 +25,7 @@ from reportlab.platypus import (
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.client_report import render_client_pdf
 from app.detection.dashboard import PRIORITY_ORDER
 from app.fingerprints import config_digest, digest_file
 from app.models import (
@@ -39,7 +41,7 @@ from app.models import (
     SourceFile,
 )
 
-VERSION = "technical-report-1"
+VERSION = "technical-report-2"
 MAX_FINDINGS = 2000
 MAX_REFERENCES = 20000
 MAX_BYTES = 20 * 1024 * 1024
@@ -52,6 +54,7 @@ class ReportInput(BaseModel):
     organization: str = Field(default="", max_length=200)
     reference: str = Field(default="", max_length=100)
     include_ai: bool = True
+    format: Literal["client", "technical"] = "client"
     # Optional optimistic lock: the reviewed preview must match the downloaded PDF.
     snapshot_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
 
@@ -190,6 +193,11 @@ def snapshot(db, storage, analysis_id):
 
 
 def render_pdf(data, metadata):
+    if metadata.format == "client":
+        output = render_client_pdf(data, metadata)
+        if len(output) > MAX_BYTES:
+            raise HTTPException(413, "El PDF supera 20 MiB. Reduce el alcance.")
+        return output
     stream = io.BytesIO()
     styles = getSampleStyleSheet()
     styles.add(

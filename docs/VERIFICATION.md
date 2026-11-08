@@ -2,6 +2,8 @@
 
 ## Informe técnico y PDF - 8 de noviembre de 2026
 
+Actualización de presentación: el formato predeterminado para cliente se redujo de 56 a **6 páginas** en el caso local, manteniendo los 20 hallazgos y las referencias exactas a las 80 evidencias. Se revisaron visualmente las seis páginas y se comprobó la descarga mediante el proxy de la aplicación. **Nueve pruebas de informes aprobadas**, incluidas compresión de filas sin añadir huecos, conservación de hallazgos y selección/validación del formato. Ruff, formato y compilación con TypeScript aprobados. El formato técnico completo permanece disponible como opción.
+
 - Batería completa: **216 pruebas aprobadas**, incluidas siete pruebas nuevas del informe. Persiste el aviso previo de deprecación de Starlette/httpx en TestClient.
 - Ruff, formato Python, TypeScript, Prettier y compilación de producción aprobados. Dependencias de generación y extracción fijadas en `uv.lock`; no se requiere una migración nueva.
 - Generación sobre el análisis local: 20 hallazgos, 80 evidencias distintas y 20 explicaciones IA, sin cambios en las prioridades. Se verificó por extracción que todos los identificadores de hallazgo y evidencia aparecen en el PDF. Documento de 56 páginas, con anexo completo y configuración. Los datos, resultados y capturas permanecen fuera de Git.

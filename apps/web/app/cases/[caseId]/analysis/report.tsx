@@ -60,6 +60,7 @@ export default function TechnicalReport({
     organization: "",
     reference: "",
     include_ai: true,
+    format: "client" as "client" | "technical",
   });
   useEffect(() => {
     if (!preview) return;
@@ -106,7 +107,7 @@ export default function TechnicalReport({
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `informe-soc-${analysisId}.pdf`;
+      anchor.download = `informe-soc-${metadata.format}-${analysisId}.pdf`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
@@ -177,16 +178,42 @@ export default function TechnicalReport({
               </label>
             ))}
           </div>
-          <label className="check-row">
-            <input
-              type="checkbox"
-              checked={metadata.include_ai}
+          <label>
+            Formato del informe
+            <select
+              value={metadata.format}
               onChange={(e) =>
-                setMetadata({ ...metadata, include_ai: e.target.checked })
+                setMetadata({
+                  ...metadata,
+                  format: e.target.value as "client" | "technical",
+                })
               }
-            />{" "}
-            Incluir explicaciones de IA completadas y validadas
+            >
+              <option value="client">
+                Para cliente · conciso (recomendado)
+              </option>
+              <option value="technical">
+                Técnico completo · con anexo de registros
+              </option>
+            </select>
           </label>
+          <p className="muted">
+            {metadata.format === "client"
+              ? "Incluye todos los hallazgos, riesgos, acciones y referencias a las filas de evidencia. Evita repetir explicaciones y adjuntar cada registro completo."
+              : "Incluye explicaciones ampliadas, registros de evidencia completos y configuración. Este formato genera más páginas."}
+          </p>
+          {metadata.format === "technical" && (
+            <label className="check-row">
+              <input
+                type="checkbox"
+                checked={metadata.include_ai}
+                onChange={(e) =>
+                  setMetadata({ ...metadata, include_ai: e.target.checked })
+                }
+              />{" "}
+              Incluir explicaciones de IA completadas y validadas
+            </label>
+          )}
           <div className="report-preview">
             <h4>Resumen ejecutivo · {data.title}</h4>
             <p>
@@ -216,9 +243,11 @@ export default function TechnicalReport({
             <p>
               IA disponible: {data.findings.filter((f) => f.ai).length}/
               {data.findings.length}.{" "}
-              {metadata.include_ai
-                ? "Se incluirán las explicaciones disponibles al preparar esta vista previa."
-                : "Las explicaciones de IA se excluirán del PDF."}
+              {metadata.format === "client"
+                ? "El PDF para cliente evita repetir las explicaciones ampliadas; siguen disponibles en el formato técnico."
+                : metadata.include_ai
+                  ? "Se incluirán las explicaciones disponibles al preparar esta vista previa."
+                  : "Las explicaciones de IA se excluirán del PDF."}
             </p>
             <details>
               <summary>Alcance, fuentes y cobertura</summary>
