@@ -1,5 +1,7 @@
 # Motor de detección local · versión 1.1.0
 
+Esta página conserva la especificación de las ocho reglas originales. La versión activa y sus 19 reglas se documentan en [DETECTION_V2.md](DETECTION_V2.md), incluyendo interpretación por registro, criterios de prioridad Crítica y conservación de resultados históricos.
+
 ## Uso
 
 Abrir un caso y entrar en **Análisis de seguridad**. Seleccionar las importaciones ya revisadas: una revisión por archivo original, hasta 20 importaciones y 100 000 eventos en total. Confirmar el perfil de fuente, umbrales, exclusiones y calendario opcional. No se solicita configuración horaria: se usan las horas del archivo. Ejecutar y revisar hallazgos, cobertura y evidencias.

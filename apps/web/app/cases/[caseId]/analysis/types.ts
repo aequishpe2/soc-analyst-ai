@@ -28,7 +28,15 @@ export type Summary = {
   coverage: Coverage[];
   import_rejected_rows: number;
   limitations: string;
-  sources: { name: string; sha256: string; import_id: string }[];
+  sources: {
+    name: string;
+    sha256: string;
+    import_id: string;
+    file_id?: string;
+  }[];
+  recognized_events?: number;
+  unknown_events?: number;
+  by_adapter?: Record<string, number>;
 };
 export type Analysis = {
   id: string;
@@ -56,6 +64,9 @@ export type Settings = {
   lateral_min: number;
   lateral_window: number;
   correlation_window: number;
+  burst_min: number;
+  burst_window: number;
+  transfer_bytes: number;
   business_hours: {
     weekdays: number[];
     start: string;
@@ -81,6 +92,10 @@ export type Finding = {
   end: string | null;
   evidence_count: number;
   attack_reference: string | null;
+  risk_score?: number;
+  severity_reason?: string;
+  risk_factors?: string[];
+  interpretation?: unknown[];
 };
 export type Group = {
   id: string;
@@ -118,6 +133,10 @@ export const reasonLabels: Record<string, string> = {
   calendar_file_time_missing:
     "No se dispone de una hora local explícita en el archivo",
   calendar_not_configured: "Calendario no configurado",
+  missing_user_or_reporting_host:
+    "Falta cuenta o equipo para relacionar la secuencia",
+  missing_valid_transfer_bytes: "Sin cantidad válida de bytes salientes",
+  missing_explicit_post: "No se identifica explícitamente el método POST",
   missing_privileged_target:
     "Sin grupo o privilegio privilegiado identificable",
   missing_command_or_process: "Sin comando ni proceso",

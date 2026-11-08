@@ -14,7 +14,7 @@ from app.mapping import profile_hint, suggestions
 from app.models import AIDraft, Analysis, AnalysisScope, AutomaticRun, Finding, SourceFile
 from app.normalization import timestamp
 
-VERSION = "automatic-1"
+VERSION = "automatic-2"
 
 
 class ReviewRequired(ValueError):
@@ -70,24 +70,44 @@ def configuration(source, storage):
         "event_provider" in m["mapping"] or "event_type" in m["mapping"] for m in mapping
     )
     hint = profile_hint(source.manifest)
-    if has_codes and not explicit and hint != "windows_security":
+    known_channels = {
+        "security",
+        "system",
+        "powershell",
+        "proxy",
+        "iis",
+        "firewall",
+        "microsoft-windows-powershell/operational",
+    }
+    has_channel = False
+    for sheet in source.manifest["sheets"]:
+        column = by_sheet.get(sheet["name"], {}).get("event_channel")
+        if column:
+            index = int(column[1:])
+            has_channel |= any(
+                index < len(row["values"])
+                and index not in row["formulas"]
+                and (row["values"][index] or "").strip().casefold() in known_channels
+                for row in sheet["preview"]
+            )
+    if has_codes and not explicit and hint != "windows_security" and not has_channel:
         raise ReviewRequired(
             "Hay códigos de evento sin proveedor identificable. Revisa el perfil de la fuente."
         )
-    profile = "windows_security" if hint == "windows_security" and not explicit else "generic"
+    profile = "auto"
     return (
         {
             "sheets": mapping,
             "date_format": date_format,
             "timezone": None,
-            "normalizer_version": "3",
+            "normalizer_version": "4",
             "parser_version": "1",
         },
         DetectionConfig(source_profile=profile),
         {
             "version": VERSION,
             "profile": profile,
-            "profile_inferred": profile == "windows_security",
+            "profile_inferred": not explicit and (hint is not None or has_channel),
             "date_format": date_format,
             "mapping": mapping,
             "notes": "Columnas y perfil propuestos por el formato. "

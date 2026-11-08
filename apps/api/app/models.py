@@ -163,8 +163,10 @@ class AIDraft(Base):
 
 class AutomaticRun(Base):
     __tablename__ = "automatic_runs"
+    __table_args__ = (UniqueConstraint("file_id", "version"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    file_id: Mapped[str] = mapped_column(ForeignKey("source_files.id"), unique=True)
+    file_id: Mapped[str] = mapped_column(ForeignKey("source_files.id"))
+    version: Mapped[str] = mapped_column(String(30), default="automatic-2")
     status: Mapped[str] = mapped_column(String(20), default="queued")
     phase: Mapped[str] = mapped_column(String(30), default="reading")
     result: Mapped[dict | None] = mapped_column(JSON, nullable=True)

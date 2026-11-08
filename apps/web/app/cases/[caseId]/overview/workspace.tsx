@@ -200,7 +200,7 @@ export default function Overview({
                   Perfil:{" "}
                   {run.result.decisions.profile === "windows_security"
                     ? "Windows Security, inferido por el formato"
-                    : "Tipos explícitos y proveedor registrado"}{" "}
+                    : "Interpretación por registro y proveedor"}{" "}
                   · Formato de fecha: {run.result.decisions.date_format}
                 </p>
                 <p>{run.result.decisions.notes}</p>

@@ -83,7 +83,7 @@ def test_upload_to_dashboard_and_automatic_ai_all_findings(client, monkeypatch):
     assert job["status"] == "succeeded"
     run = start(client, case_id, file_id)
     assert run["status"] == "succeeded", run
-    assert run["result"]["decisions"]["profile"] == "windows_security"
+    assert run["result"]["decisions"]["profile"] == "auto"
     assert run["result"]["decisions"]["date_format"] == "iso8601"
     analysis_id = run["result"]["analysis_id"]
     dashboard = client.get(f"/api/v1/analyses/{analysis_id}/dashboard").json()
@@ -248,3 +248,28 @@ def test_interrupted_automatic_workflow_is_recoverable(client, monkeypatch):
     state = client.get(f"/api/v1/cases/{identifier}/automatic/{run_id}").json()
     assert state["status"] == "failed" and "interrumpido" in state["error"]
     assert start(client, identifier, file_id)["status"] == "succeeded"
+
+
+def test_new_engine_does_not_reuse_or_overwrite_old_workflow(client, monkeypatch):
+    monkeypatch.setattr(client.app.state.jobs, "ai_provider", FakeProvider())
+    identifier = case(client)
+    file_id, _ = upload(client, identifier, data())
+    old_id = str(uuid.uuid4())
+    with Session(client.app.state.engine) as db:
+        db.add(
+            AutomaticRun(
+                id=old_id,
+                file_id=file_id,
+                version="automatic-1",
+                status="succeeded",
+                phase="ready",
+                result={"historical": True},
+            )
+        )
+        db.commit()
+    current = start(client, identifier, file_id)
+    assert current["status"] == "succeeded"
+    assert current["id"] != old_id
+    with Session(client.app.state.engine) as db:
+        assert db.get(AutomaticRun, old_id).result == {"historical": True}
+        assert db.get(AutomaticRun, current["id"]).version == "automatic-2"

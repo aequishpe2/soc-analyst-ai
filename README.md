@@ -4,7 +4,7 @@ Aplicación web local en desarrollo para apoyar a analistas SOC Nivel 2 con regi
 
 ## Estado
 
-Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, ocho reglas deterministas, cobertura y grupos de investigación con evidencias trazables. El dashboard interactivo incluye criticidad, reglas, fechas, usuarios y equipos, con filtros compartidos con la lista de hallazgos. El asistente local Ollama/Qwen3:8b prepara borradores por hallazgo con explicación, evidencias y plan de acción a partir de contenido validado. No se solicita configuración horaria: se utilizan las horas del archivo. Siguen pendientes la revisión humana con cambios auditados, las consultas autónomas del agente y el informe global con PDF.
+Implementado: casos, carga segura Excel/CSV, mapeo e importaciones versionadas, 19 reglas contextuales, cobertura y grupos de investigación con evidencias trazables. El motor 2.0 interpreta por registro Windows Security/System, PowerShell y los formatos admitidos de Proxy/IIS/Firewall; explica la prioridad de cada hallazgo y conserva los resultados históricos. El dashboard incluye criticidad, reglas, fechas, usuarios y equipos, con filtros compartidos con la lista. Ollama/Qwen3:8b prepara explicaciones y planes de acción a partir de contenido validado. No se solicita configuración horaria. Siguen pendientes revisión humana con cambios auditados, consultas autónomas del agente e informe global con PDF.
 
 En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://127.0.0.1:3000`. Usar `Detener-SOC.cmd` al terminar. Las herramientas y el modelo se instalan fuera del control de versiones; un clon nuevo requiere seguir la guía de arranque.
 
@@ -15,6 +15,7 @@ Flujo principal: **cargar Excel/CSV → dashboard automático → explicaciones 
 - [Arranque local y verificaciones](docs/LOCAL_SETUP.md)
 - [Importación: uso, límites y garantías](docs/INGESTION.md)
 - [Detección y correlación: reglas, alcance y límites](docs/DETECTION.md)
+- [Motor 2.0: fuentes, 19 reglas y política de criticidad](docs/DETECTION_V2.md)
 - [IA local: uso, privacidad, validación y límites](docs/AI.md)
 - [Dashboard: gráficos, filtros y significado de los conteos](docs/DASHBOARD.md)
 - [Carga automática: funcionamiento, decisiones y recuperación](docs/AUTOMATIC.md)

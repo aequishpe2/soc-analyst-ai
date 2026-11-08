@@ -8,11 +8,12 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import Bundle, Session
 
+from app.detection import extended
 from app.detection.engine import RULES
 from app.fingerprints import config_digest, digest_file
 from app.models import AIDraft, Analysis, Event, Finding, FindingEvidence, ImportRun, SourceFile
 
-VERSION = "grounded-outline-1"
+VERSION = "grounded-outline-2"
 MAX_RESPONSE = 16384
 OPTIONS = {"temperature": 0, "seed": 17, "num_predict": 512, "num_ctx": 4096}
 SYSTEM = (
@@ -85,6 +86,10 @@ REMEDIATE = {
         "permisos sobre auditoría."
     ),
 }
+
+
+CONTAIN.update(extended.CONTAIN)
+REMEDIATE.update(extended.REMEDIATE)
 
 
 class Outline(BaseModel):
@@ -251,6 +256,8 @@ def snapshot(db, finding, storage):
         "title": p["title"],
         "severity": finding.severity,
         "confidence": finding.confidence,
+        "risk_reason": p.get("severity_reason"),
+        "risk_score": p.get("risk_score"),
         "facts": {"F1": p["reason"], "F2": p["limitations"], "F3": p["potential_impact"]},
         "evidence": {f"E{i + 1}": {"role": ref["role"]} for i, ref in enumerate(selected)},
         "investigate": {
@@ -299,6 +306,8 @@ def compose(raw, catalog, proof):
         "title": catalog["title"],
         "severity": catalog["severity"],
         "confidence": catalog["confidence"],
+        "risk_reason": catalog.get("risk_reason"),
+        "risk_score": catalog.get("risk_score"),
         "explanation": [catalog["facts"][key] for key in outline.fact_ids],
         "plan": {
             phase: [catalog[phase][key] for key in selections[phase]]

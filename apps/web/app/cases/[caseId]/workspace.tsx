@@ -90,6 +90,9 @@ const fields = [
   ["target_group", "Grupo de destino"],
   ["target_user", "Cuenta afectada o miembro añadido"],
   ["privilege", "Privilegio o rol asignado"],
+  ["reporting_host", "Equipo que registra el evento"],
+  ["event_channel", "Canal o fuente del registro"],
+  ["event_description", "Descripción registrada"],
 ];
 const clip = (text: string | null | undefined) =>
   text ? text.slice(0, 180) + (text.length > 180 ? "…" : "") : "—";

@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.detection.config import ENGINE_VERSION, MAX_EVENTS, RULESET_VERSION, DetectionConfig
-from app.detection.dashboard import FindingFilters, aggregate, input_activity
+from app.detection.dashboard import PRIORITY_ORDER, FindingFilters, aggregate, input_activity
 from app.detection.engine import RULES
 from app.detection.semantics import (
     AUTH,
@@ -247,7 +247,9 @@ def router_for(engine, jobs):
             "items": [
                 finding_output(f)
                 for f in db.scalars(
-                    query.order_by(Finding.rule_id, Finding.id).offset(offset).limit(limit)
+                    query.order_by(PRIORITY_ORDER, Finding.rule_id, Finding.id)
+                    .offset(offset)
+                    .limit(limit)
                 )
             ],
             "total": db.scalar(select(func.count()).select_from(query.subquery())),

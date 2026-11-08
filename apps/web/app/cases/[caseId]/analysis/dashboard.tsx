@@ -11,6 +11,11 @@ type Data = {
     command_events: number;
     event_codes: Count[];
     evaluable_rules: number;
+    total_rules: number;
+    recognized_events?: number | null;
+    unknown_events?: number | null;
+    by_adapter?: Record<string, number>;
+    by_kind?: Record<string, number>;
   };
   total: number;
   groups: number;
@@ -27,6 +32,16 @@ const colors: Record<string, string> = {
   Alto: "#ffb47a",
   Medio: "#e7cc73",
   Bajo: "#6de6b9",
+};
+const sourceLabels: Record<string, string> = {
+  windows_security: "Windows Security",
+  windows_security_channel: "Windows Security (canal)",
+  windows_system: "Windows System",
+  windows_powershell: "PowerShell",
+  proxy_export: "Proxy",
+  iis_export: "IIS / HTTP",
+  firewall_export: "Firewall",
+  canonical_or_unknown: "Tipos canónicos u origen no identificado",
 };
 
 function Bars({
@@ -154,7 +169,10 @@ export default function Dashboard({
           </div>
           <div>
             <span>Reglas con eventos evaluables</span>
-            <strong>{data.input_activity.evaluable_rules} / 8</strong>
+            <strong>
+              {data.input_activity.evaluable_rules} /{" "}
+              {data.input_activity.total_rules}
+            </strong>
           </div>
         </div>
         {data.input_activity.event_codes.length > 0 && (
@@ -165,6 +183,28 @@ export default function Dashboard({
               .join(" · ")}
             . Estos conteos describen la entrada y no son alertas.
           </p>
+        )}
+        {data.input_activity.recognized_events != null && (
+          <p className="notice">
+            {data.input_activity.recognized_events} eventos con tipo
+            interpretado · {data.input_activity.unknown_events ?? 0} sin
+            interpretar. Interpretar un evento no equivale a considerarlo
+            malicioso.
+          </p>
+        )}
+        {!!Object.keys(data.input_activity.by_adapter ?? {}).length && (
+          <details>
+            <summary>Fuentes y cobertura de interpretación</summary>
+            <ul>
+              {Object.entries(data.input_activity.by_adapter ?? {}).map(
+                ([name, count]) => (
+                  <li key={name}>
+                    {sourceLabels[name] ?? name}: {count}
+                  </li>
+                ),
+              )}
+            </ul>
+          </details>
         )}
       </section>
       <p className="muted">

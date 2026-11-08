@@ -97,3 +97,14 @@ Migración 0006, flujo `automatic-1`, consumidor de IA separado y ruta `/cases/{
 - La ventana de aproximadamente 714 píxeles se comprobó sin desbordamiento horizontal. Se corrigió la interacción entre los estilos compartidos y la vista adaptable. Captura `.local/automatic-blue-verified.png`, excluida de Git. No se ajustó el viewport para la captura.
 
 No se generó IA automáticamente sobre casos anteriores del usuario durante esta prueba. El flujo nuevo opera sobre la carga que se le solicita. La clasificación conserva las reglas y evidencias existentes; no implica detección universal ni confirmación automática de incidentes. PDF e informe global siguen pendientes.
+
+## Motor contextual 2.0 y prioridades explicables
+
+Motor `2.0.0`, catálogo de 19 reglas `soc-context-1`, normalizador 4, flujo `automatic-2` y composición IA `grounded-outline-2`. La migración 0007 conserva versiones de flujo por archivo en lugar de reutilizar un resultado antiguo bajo reglas nuevas.
+
+- **209 pruebas aprobadas**, incluyendo las anteriores y 37 verificaciones adicionales de interpretación y reglas contextuales. Positivos y negativos sobre recuperación, tareas, servicios, compresión, PowerShell, peticiones web, volumen POST, ráfagas distribuidas y relaciones remotas; separación entre relojes, origen/canal insuficiente, metadatos contradictorios, resultados fallidos, cadenas citadas como texto y consultas malformadas. La prioridad de tareas/servicios inspecciona la acción o el binario configurado, sin elevarla por una ruta en una descripción ajena.
+- Se verifica que 4672 no se declare escalamiento por sí solo, que un ID numérico no identifique al proveedor, que GET no se acumule como POST y que una orden fallida no reciba la prioridad Crítica reservada a la condición explícita de recuperación.
+- La prueba de versionado demuestra que un flujo nuevo no reutiliza ni sobrescribe una ejecución anterior. Migración y `alembic check` desde base vacía aprobados; Ruff, formato, tipos y compilación de producción aprobados. No se agregaron dependencias.
+- La revisión del archivo autorizado del usuario se conserva por separado. Se comprobaron pertenencia, hash de evidencias, orden por prioridad, conteos de dashboard y hallazgos, y finalización de todas las explicaciones con Ollama. Datos, IDs, resultados privados y capturas permanecen en `.local`, fuera de Git.
+
+El nivel de prioridad expresa urgencia para investigar, no confirma un incidente ni el efecto de una orden. Las referencias ATT&CK orientan la investigación. Estas pruebas no acreditan precisión universal, cobertura de todos los SIEM ni rendimiento al máximo de archivo. Informe global/PDF, aprobación auditable y evaluación de calidad sobre un corpus independiente siguen pendientes.

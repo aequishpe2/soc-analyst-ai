@@ -10,20 +10,20 @@ Ollama prepara automáticamente una explicación por cada hallazgo. La detecció
 
 ## Interpretación y rigor
 
-Versión del flujo: `automatic-1`. Las columnas y el perfil elegidos se conservan en las decisiones de la ejecución. El analista puede consultarlos desde **Cómo se interpretó el archivo automáticamente**.
+Versión del flujo: `automatic-2`, con motor contextual 2.0 y normalizador 4. Las columnas y el perfil elegidos se conservan en las decisiones. El analista puede consultarlos desde **Cómo se interpretó el archivo automáticamente**. Ver [fuentes, reglas y prioridades](DETECTION_V2.md).
 
 - Las fechas se comprueban en todas las filas. Formatos día/mes ambiguos o mezclados requieren una revisión explícita. Las unidades epoch solo se proponen para magnitudes reconocibles de diez o trece dígitos. Fechas sin referencia conservan su reloj; no se solicita una ubicación.
 - Se usan las sugerencias conservadoras de `mapping.py`. La asignación de `Destination` sigue basada en la muestra y debe revisarse si una columna mezcla clases más adelante; no se certifica el esquema de todo el archivo.
-- El perfil Windows Security puede inferirse de un proveedor explícito o del formato conocido con canal, código y descripción. Esa inferencia queda visible y no certifica la procedencia del archivo. Un código numérico sin contexto no autoriza esa interpretación.
+- El perfil automático interpreta cada registro según proveedor, canal y campos explícitos. Esto permite archivos mixtos Windows, PowerShell, Proxy e IIS dentro de los formatos admitidos. La inferencia queda visible y no certifica la procedencia. Un código numérico sin contexto no autoriza esa interpretación.
 - Si hay hojas sin columnas reconocibles o un proveedor indeterminado, el flujo queda en `needs_review` y ofrece abrir los ajustes. No se fabrica un dashboard de alertas positivas para evitar ese estado.
 - No se presupone un horario laboral ni se cambian umbrales para producir más alertas. El dashboard informa cobertura parcial, condiciones no evaluables y datos ausentes. Un grupo no equivale a un incidente confirmado.
 - La IA sigue el contrato de [composición restringida](AI.md): organiza explicaciones y recomendaciones permitidas, sin crear hechos ni reclasificar riesgos de forma libre. Los registros originales y sus comandos no se envían al modelo.
 
 ## Persistencia y ejecución
 
-Migración 0006: `automatic_runs` y un índice para localizar borradores pendientes. Una ejecución automática por fuente; nuevas solicitudes recuperan el estado existente y los fallos pueden reintentarse explícitamente. Las importaciones y análisis conservan sus propias huellas e historial. El original se verifica mediante SHA-256 antes de procesar.
+Migraciones 0006 y 0007: `automatic_runs`, índice de borradores pendientes y unicidad por archivo/versión. Las solicitudes de la misma versión recuperan su estado; una versión nueva conserva el historial y genera su propia revisión. Los fallos pueden reintentarse explícitamente. El original se verifica mediante SHA-256 antes de procesar.
 
-La cola local de ocho posiciones procesa lectura, importación y detección. Un segundo consumidor local procesa la cola durable de borradores de IA, uno por vez. Esto evita que una inferencia de varios segundos bloquee nuevas importaciones. La inferencia de cada borrador mantiene 512 tokens de salida y 180 segundos máximos; muchos hallazgos pueden tardar considerablemente más en completarse, con progreso visible.
+La cola local de ocho posiciones procesa lectura, importación y detección. Un segundo consumidor procesa los borradores de IA uno por vez, priorizando Críticos y Altos. Esto evita bloquear nuevas importaciones. Cada borrador mantiene 512 tokens de salida y 180 segundos máximos; muchos hallazgos pueden tardar más en completarse, con progreso visible.
 
 Se admite una sola instancia de API. Al reiniciar, los trabajos interrumpidos se marcan fallidos; no aparecen como completados. Se puede reintentar el flujo o las explicaciones desde la interfaz. Si falta Ollama o el modelo, el análisis determinista termina y las explicaciones se pueden solicitar al recuperar el servicio. No hay fallback externo.
 

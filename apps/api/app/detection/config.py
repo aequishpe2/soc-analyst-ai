@@ -6,8 +6,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic.json_schema import SkipJsonSchema
 
-ENGINE_VERSION = "1.1.0"
-RULESET_VERSION = "soc-local-2"
+ENGINE_VERSION = "2.0.0"
+RULESET_VERSION = "soc-context-1"
 MAX_EVENTS = 100_000
 MAX_INPUT_BYTES = 64 * 1024 * 1024
 MAX_FINDINGS = 5000
@@ -40,7 +40,7 @@ class BusinessHours(BaseModel):
 
 class DetectionConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    source_profile: Literal["generic", "windows_security"] = "generic"
+    source_profile: Literal["auto", "generic", "windows_security"] = "auto"
     brute_min: int = Field(default=10, ge=2, le=1000)
     brute_window: int = Field(default=300, ge=30, le=3600)
     spray_min: int = Field(default=10, ge=2, le=1000)
@@ -50,6 +50,9 @@ class DetectionConfig(BaseModel):
     lateral_min: int = Field(default=3, ge=2, le=1000)
     lateral_window: int = Field(default=600, ge=30, le=3600)
     correlation_window: int = Field(default=1800, ge=30, le=3600)
+    burst_min: int = Field(default=20, ge=5, le=1000)
+    burst_window: int = Field(default=900, ge=30, le=3600)
+    transfer_bytes: int = Field(default=104857600, ge=1048576, le=1099511627776)
     business_hours: BusinessHours | None = None
     excluded_users: list[str] = Field(default_factory=list, max_length=50)
     excluded_source_ips: list[str] = Field(default_factory=list, max_length=50)

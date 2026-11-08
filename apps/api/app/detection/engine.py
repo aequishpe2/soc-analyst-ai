@@ -5,6 +5,7 @@ from collections import Counter, defaultdict, deque
 from datetime import time
 from zoneinfo import ZoneInfo
 
+from app.detection import extended
 from app.detection.config import ENGINE_VERSION, MAX_FINDINGS, MAX_LINKS, RULESET_VERSION
 from app.detection.semantics import (
     duplicate_fingerprint,
@@ -115,6 +116,11 @@ ACTIONS = {
 }
 
 
+RULES.update(extended.CATALOG)
+LIMITATIONS.update(extended.LIMITATIONS)
+ACTIONS.update({key: [value] for key, value in extended.INVESTIGATE.items()})
+
+
 def command_matches(observation):
     """Tokenize for inspection only; never execute or decode any command."""
     command = observation.values.get("command") or ""
@@ -189,6 +195,8 @@ def episodes(rows, window, threshold, distinct=None):
 
 
 def eligible(rule, row):
+    if rule in extended.CATALOG:
+        return extended.eligible(rule, row)
     if rule == "suspicious_command":
         return (
             None
@@ -339,6 +347,40 @@ def detect(events, config):
                     "title": title,
                     "severity": severity,
                     "confidence": confidence,
+                    "risk_score": {"Crítico": 95, "Alto": 75, "Medio": 50, "Bajo": 25}[severity],
+                    "severity_reason": (
+                        (
+                            "Prioridad crítica por una orden explícita, total y silenciosa "
+                            "contra la "
+                            "recuperación; "
+                            "el resultado registrado no confirma el efecto de borrado."
+                        )
+                        if severity == "Crítico"
+                        else (
+                            "Prioridad alta por un patrón o secuencia de riesgo sustentado en las "
+                            "evidencias; requiere validar autorización."
+                        )
+                        if severity == "Alto"
+                        else (
+                            "Prioridad media por una operación o patrón que requiere contexto "
+                            "adicional."
+                        )
+                        if severity == "Medio"
+                        else (
+                            "Prioridad baja: comportamiento observable que puede ser actividad "
+                            "administrativa habitual."
+                        )
+                    ),
+                    "risk_factors": sorted(k for k, v in observed.items() if v is True)
+                    or ["matched_rule_condition"],
+                    "interpretation": list(
+                        {
+                            config_digest(r.provenance): r.provenance
+                            for r in evidence
+                            if r.provenance["adapter"] != "canonical_or_unknown"
+                            or r.provenance["derived"]
+                        }.values()
+                    ),
                     "attack_reference": attack,
                     "status": "requires_review",
                     "reason": reason,
@@ -357,9 +399,14 @@ def detect(events, config):
                     ],
                 }
             )
+            if rule in extended.CATALOG:
+                findings[-1]["severity_reason"] = extended.rationale(rule, observed, severity)
+                findings[-1]["potential_impact"] = extended.IMPACTS[rule]
             record["findings"] += 1
 
-        if rule in {"brute_force", "password_spraying", "lateral_movement"}:
+        if rule in extended.CATALOG:
+            extended.run(rule, usable, rows, config, emit)
+        elif rule in {"brute_force", "password_spraying", "lateral_movement"}:
             grouped = defaultdict(list)
             for row in usable:
                 key = (
@@ -547,6 +594,10 @@ def detect(events, config):
             "excluded_events": sum(exclusions.values()),
             "exclusions": dict(exclusions),
             "conflicting_semantics": conflicts,
+            "recognized_events": sum(r.kind is not None for r in rows),
+            "unknown_events": sum(r.kind is None for r in rows),
+            "by_adapter": dict(Counter(r.provenance["adapter"] for r in rows)),
+            "by_kind": dict(Counter(r.kind or "unknown" for r in rows)),
             "coverage": coverage,
             "findings": len(findings),
             "investigation_groups": len(groups),

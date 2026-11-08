@@ -19,6 +19,9 @@ FIELDS = (
     "target_group",
     "target_user",
     "privilege",
+    "reporting_host",
+    "event_channel",
+    "event_description",
 )
 DATE_FORMATS = ("iso8601", "dmy", "mdy", "epoch_seconds", "epoch_milliseconds")
 

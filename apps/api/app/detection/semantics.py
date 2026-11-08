@@ -5,6 +5,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 
+from app.detection.adapters import adapt
 from app.fingerprints import config_digest
 from app.normalization import FIELDS
 
@@ -84,10 +85,11 @@ class Observation:
     assets: set
     clock: str
     wall_time: datetime | None
+    provenance: dict
 
 
 def interpret(row, config):
-    values = row["normalized"]
+    values, native, provenance = adapt(row["normalized"], config.source_profile)
     raw_result = (values.get("result") or "").strip().casefold()
     outcome = "success" if raw_result in SUCCESS else "failure" if raw_result in FAILURE else None
     declared = token(values.get("event_type"))
@@ -98,6 +100,20 @@ def interpret(row, config):
         if declared in GRANTS
         else "control"
         if declared in CONTROLS
+        else "process"
+        if declared in {"process", "process_create", "process_start", "command_execution"}
+        else "task"
+        if declared in {"scheduled_task_created", "scheduled_task_updated"}
+        else "service"
+        if declared == "service_installed"
+        else "proxy"
+        if declared == "proxy_access"
+        else "web"
+        if declared == "http_access"
+        else "share"
+        if declared == "share_access"
+        else "privileged_session"
+        if declared == "special_privileges_assigned"
         else "other"
         if declared in OTHER
         else None
@@ -110,31 +126,10 @@ def interpret(row, config):
         else None
     )
     remote = declared in REMOTE
-    provider = (values.get("event_provider") or "").strip().casefold()
-    windows = (
-        config.source_profile == "windows_security"
-        or provider == "microsoft-windows-security-auditing"
-    )
-    code = (values.get("provider_event_id") or "").strip()
-    # No interpretation of numeric IDs without an explicit provider/profile.
-    native = (
-        {
-            "4624": ("auth", "success"),
-            "4625": ("auth", "failure"),
-            "4728": ("grant", "success"),
-            "4732": ("grant", "success"),
-            "4756": ("grant", "success"),
-            "1102": ("control", "success"),
-            "4672": ("other", None),
-            "4719": ("other", None),
-        }.get(code)
-        if windows
-        else None
-    )
-    conflict = False
+    conflict = bool(values.get("derivation_conflict"))
     if native:
         native_kind, native_outcome = native
-        conflict = bool(kind and kind != native_kind or expected and expected != native_outcome)
+        conflict |= bool(kind and kind != native_kind or expected and expected != native_outcome)
         kind, expected = native_kind, native_outcome
         remote = kind == "auth" and (values.get("logon_type") or "").strip() in {"3", "10"}
     if expected:
@@ -157,6 +152,7 @@ def interpret(row, config):
             ("host:", dest_host),
             ("ip:", origin_ip),
             ("ip:", dest_ip),
+            ("host:", identifier(values.get("reporting_host"), 253, True)),
         )
         if value
     }
@@ -189,6 +185,7 @@ def interpret(row, config):
         assets,
         clock,
         wall,
+        provenance,
     )
 
 

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { api, displayDetails } from "../../../../lib/api";
 import FindingEvidence, { OriginalEvidence } from "./evidence";
@@ -27,6 +28,14 @@ const thresholds: [keyof Settings, string, number, number][] = [
   ["lateral_min", "Destinos remotos distintos", 2, 1000],
   ["lateral_window", "Ventana accesos remotos (segundos)", 30, 3600],
   ["correlation_window", "Ventana de correlación (segundos)", 30, 3600],
+  ["burst_min", "Fallos mínimos en una ráfaga distribuida", 5, 1000],
+  ["burst_window", "Ventana de ráfagas y transferencias (segundos)", 30, 3600],
+  [
+    "transfer_bytes",
+    "Umbral de transferencia POST (bytes)",
+    1048576,
+    1099511627776,
+  ],
 ];
 const emptyFilters = { date_from: "", date_to: "", user: "", host: "" };
 function lines(value: string) {
@@ -55,7 +64,8 @@ function CoverageTable({ rows }: { rows: Coverage[] }) {
     <div className="table-scroll">
       <table>
         <caption>
-          Cobertura de las ocho reglas · se informa lo que no pudo evaluarse
+          Cobertura de {rows.length} reglas · se informa lo que no pudo
+          evaluarse
         </caption>
         <thead>
           <tr>
@@ -97,6 +107,8 @@ export default function AnalysisWorkspace({
   compact?: boolean;
   initialAnalysisId?: string;
 }) {
+  const router = useRouter();
+  const [currentEngine, setCurrentEngine] = useState("");
   const [title, setTitle] = useState("Investigación");
   const [imports, setImports] = useState<Scope[]>([]);
   const [importsLoading, setImportsLoading] = useState(true);
@@ -160,13 +172,16 @@ export default function AnalysisWorkspace({
         setTitle(c.title);
       })
       .catch((e) => setError(e.message));
-    api<{ defaults: Settings; rules: { id: string; title: string }[] }>(
-      "detection/rules",
-    )
+    api<{
+      engine_version: string;
+      defaults: Settings;
+      rules: { id: string; title: string }[];
+    }>("detection/rules")
       .then((data) => {
         setSettings(data.defaults);
         setPrivilegedGroups(data.defaults.privileged_groups.join("\n"));
         setCatalog(data.rules);
+        setCurrentEngine(data.engine_version);
       })
       .catch((e) => setError(e.message));
   }, [caseId]);
@@ -584,6 +599,9 @@ export default function AnalysisWorkspace({
                 <option value="generic">
                   Genérica: tipos explícitos y proveedor mapeado
                 </option>
+                <option value="auto">
+                  Automática por registro: canal, proveedor y campos explícitos
+                </option>
                 <option value="windows_security">
                   Windows Security: códigos nativos de ese proveedor
                 </option>
@@ -810,6 +828,45 @@ export default function AnalysisWorkspace({
           {analysis.summary && (
             <>
               <p className="muted">{analysis.summary.limitations}</p>
+              {currentEngine &&
+                analysis.config.engine_version !== currentEngine && (
+                  <div className="notice" role="status">
+                    <strong>
+                      Resultado histórico · motor{" "}
+                      {analysis.config.engine_version}
+                    </strong>
+                    <p>
+                      Esta ejecución no incluye las detecciones del motor{" "}
+                      {currentEngine}. Puedes conservarla y generar una nueva
+                      revisión.
+                    </p>
+                    {analysis.summary.sources.length === 1 &&
+                      analysis.summary.sources[0].file_id && (
+                        <button
+                          type="button"
+                          className="secondary"
+                          disabled={busy}
+                          onClick={async () => {
+                            setBusy(true);
+                            try {
+                              const result = await api<{ id: string }>(
+                                `cases/${caseId}/files/${analysis.summary!.sources[0].file_id}/automatic`,
+                                { method: "POST" },
+                              );
+                              router.push(
+                                `/cases/${caseId}/overview?run=${result.id}`,
+                              );
+                            } catch (e) {
+                              setError((e as Error).message);
+                              setBusy(false);
+                            }
+                          }}
+                        >
+                          Reanalizar con el motor actual
+                        </button>
+                      )}
+                  </div>
+                )}
               {analysis.summary.coverage.every(
                 (r) => r.eligible_events === 0,
               ) && (
@@ -866,9 +923,9 @@ export default function AnalysisWorkspace({
                 rechazadas durante la importación.
               </p>
               <p className="info-note">
-                No se asigna Crítico automáticamente: esta versión no verifica
-                impacto grave ni criticidad del activo. La confianza describe la
-                inferencia de riesgo, no una confirmación de compromiso.
+                La criticidad indica prioridad de investigación, no impacto
+                confirmado. Cada hallazgo explica sus condiciones y
+                limitaciones. La confianza se muestra por separado.
               </p>
               <details>
                 <summary>Configuración y huella de esta ejecución</summary>
@@ -1102,6 +1159,16 @@ export default function AnalysisWorkspace({
                       · Requiere revisión
                     </p>
                     <p>{f.reason}</p>
+                    {f.severity_reason && (
+                      <div className="risk-rationale">
+                        <strong>Por qué {f.severity}</strong>
+                        <p>{f.severity_reason}</p>
+                        <small>
+                          Prioridad: {f.risk_score}/100 · Escala de la política,
+                          no probabilidad de compromiso.
+                        </small>
+                      </div>
+                    )}
                     <p className="muted">
                       {f.start ?? "Sin hora válida"}
                       {f.end && f.end !== f.start ? ` → ${f.end}` : ""}

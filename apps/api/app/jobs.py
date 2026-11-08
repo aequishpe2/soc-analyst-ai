@@ -15,9 +15,20 @@ from sqlalchemy.orm import Session
 
 from app.ai import execute_draft
 from app.automatic import execute_automatic
+from app.detection.dashboard import PRIORITY_ORDER
 from app.detection.service import execute_analysis
 from app.fingerprints import config_digest, digest_file
-from app.models import AIDraft, Analysis, AutomaticRun, Event, ImportRun, Job, RowIssue, SourceFile
+from app.models import (
+    AIDraft,
+    Analysis,
+    AutomaticRun,
+    Event,
+    Finding,
+    ImportRun,
+    Job,
+    RowIssue,
+    SourceFile,
+)
 from app.normalization import normalize
 
 
@@ -98,8 +109,9 @@ class LocalJobs:
             with Session(self.engine) as db:
                 identifier = db.scalar(
                     select(AIDraft.id)
+                    .join(Finding)
                     .where(AIDraft.status == "queued")
-                    .order_by(AIDraft.created_at, AIDraft.id)
+                    .order_by(PRIORITY_ORDER, AIDraft.created_at, AIDraft.id)
                     .limit(1)
                 )
             if identifier:

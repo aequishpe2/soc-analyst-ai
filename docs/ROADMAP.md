@@ -4,6 +4,8 @@ Las fases están ordenadas por dependencias. Ninguna funcionalidad se considera 
 
 Estado actual: base local, importación, motor determinista, dashboard interactivo y asistente IA local por hallazgo implementados y verificados con SQLite y datos sintéticos. Ver DASHBOARD.md y AI.md. Pendientes Compose/PostgreSQL, validación de rendimiento máximo, worker distribuido y evaluación de utilidad SOC. Siguen la revisión humana auditable y el informe global con PDF.
 
+Actualización analítica: motor contextual 2.0 con 19 reglas, interpretación por registro de las fuentes admitidas, prioridades justificadas e historial versionado. Ver [DETECTION_V2.md](DETECTION_V2.md). El número de pruebas funcionales no se presenta como una medición de precisión en todos los escenarios SOC.
+
 ## 1. Base ejecutable
 
 Crear monorepo, Compose, configuración de ejemplo sin secretos, API de salud, migraciones iniciales y shell de interfaz en español. CI con lint, tipos, pruebas y escaneo de dependencias/secretos. Dependencias fijadas y guía de arranque desde clon limpio.

@@ -12,6 +12,8 @@ Cada hallazgo tiene un borrador persistente. Solicitudes repetidas devuelven el 
 
 ## Rigor y alcance de esta entrega
 
+La versión actual de composición es `grounded-outline-2`. Conserva también la justificación de prioridad y el valor de la política de riesgo del hallazgo, sin permitir que el modelo los sustituya por texto o niveles arbitrarios.
+
 Se implementa composición restringida, no redacción libre ni un agente autónomo. Qwen3 organiza hechos y limitaciones ya comprobados, selecciona referencias y prioriza recomendaciones de un catálogo por regla. El servidor compone los párrafos en español a partir de esa selección. El modelo no puede introducir hechos nuevos, cambiar la criticidad, quitar limitaciones ni escribir comandos o acciones arbitrarias.
 
 Comprobar que una referencia exista no demuestra que una frase generada esté sustentada. Por eso la salida admite identificadores de contenido permitido, nunca afirmaciones de texto libre. Se rechazan campos extra, identificadores desconocidos o repetidos, omisiones de hechos y ausencia de roles de evidencia necesarios (por ejemplo, fallos y éxito posterior).

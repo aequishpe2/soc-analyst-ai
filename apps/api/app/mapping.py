@@ -22,6 +22,9 @@ ALIASES = {
     "target_group": ["targetgroup", "groupname", "targetgroupname"],
     "target_user": ["targetusername", "membername"],
     "privilege": ["privileges", "role"],
+    "reporting_host": ["hostname", "computer", "computername", "host"],
+    "event_channel": ["log_source", "channel", "logname"],
+    "event_description": ["description", "event_description", "message"],
 }
 
 

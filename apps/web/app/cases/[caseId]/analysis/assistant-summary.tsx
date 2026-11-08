@@ -13,6 +13,7 @@ type Item = {
     result: null | {
       explanation: string[];
       evidence_count: number;
+      risk_reason?: string | null;
       plan: Record<string, string[]>;
     };
   };
@@ -129,6 +130,11 @@ export default function AssistantSummary({
                   </div>
                   {item.draft?.status === "succeeded" && item.draft.result ? (
                     <>
+                      {item.draft.result.risk_reason && (
+                        <p className="risk-rationale">
+                          {item.draft.result.risk_reason}
+                        </p>
+                      )}
                       {item.draft.result.explanation.map((text, i) => (
                         <p key={i}>{text}</p>
                       ))}

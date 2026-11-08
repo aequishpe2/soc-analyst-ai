@@ -5,13 +5,16 @@ from datetime import date
 from typing import Annotated, Literal
 
 from fastapi import HTTPException, Query
-from sqlalchemy import func, or_, select, union_all
+from sqlalchemy import case, func, or_, select, union_all
 
 from app.detection.engine import RULES
 from app.detection.semantics import MISSING
 from app.models import Event, Finding, FindingEvidence, InvestigationGroup
 
 SEVERITIES = ("Crítico", "Alto", "Medio", "Bajo")
+PRIORITY_ORDER = case(
+    *[(Finding.severity == value, index) for index, value in enumerate(SEVERITIES)], else_=4
+)
 
 
 class FindingFilters:
@@ -58,7 +61,7 @@ class FindingFilters:
             # Both entity conditions must match the same linked event.
             for value, fields in (
                 (self.user, ("user", "target_user")),
-                (self.host, ("source_host", "destination_host")),
+                (self.host, ("source_host", "destination_host", "reporting_host")),
             ):
                 if value:
                     evidence = evidence.where(
@@ -108,6 +111,11 @@ def input_activity(db, analysis):
             )
         ],
         "evaluable_rules": sum(r["eligible_events"] > 0 for r in analysis.summary["coverage"]),
+        "total_rules": len(analysis.summary["coverage"]),
+        "recognized_events": analysis.summary.get("recognized_events"),
+        "unknown_events": analysis.summary.get("unknown_events"),
+        "by_adapter": analysis.summary.get("by_adapter", {}),
+        "by_kind": analysis.summary.get("by_kind", {}),
     }
 
 
@@ -162,5 +170,5 @@ def aggregate(db, query):
         "timeline": [{"value": value, "count": count} for value, count in timeline if value],
         "undated": sum(count for value, count in timeline if not value),
         "top_users": entities(("user", "target_user")),
-        "top_hosts": entities(("source_host", "destination_host")),
+        "top_hosts": entities(("source_host", "destination_host", "reporting_host")),
     }

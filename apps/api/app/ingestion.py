@@ -235,7 +235,7 @@ def router_for(engine, jobs, storage):
                 raise HTTPException(422, "Mapeo de hoja o columna inválido.")
             if len(set(sheet.mapping.values())) != len(sheet.mapping):
                 raise HTTPException(422, "No asignes una columna a varios campos.")
-        config = {**payload.model_dump(), "normalizer_version": "3", "parser_version": "1"}
+        config = {**payload.model_dump(), "normalizer_version": "4", "parser_version": "1"}
         config["sheets"] = sorted(config["sheets"], key=lambda s: s["sheet"])
         fingerprint = config_digest(config)
         for previous in db.scalars(
