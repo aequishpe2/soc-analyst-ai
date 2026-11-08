@@ -2,6 +2,8 @@
 
 Las fases están ordenadas por dependencias. Ninguna funcionalidad se considera entregada solo por tener una pantalla.
 
+Estado actual: base local e importación implementadas y verificadas con SQLite y archivos sintéticos. Pendientes la validación de Compose/PostgreSQL y el worker distribuido de la arquitectura objetivo. Ver INGESTION.md y VERIFICATION.md. La siguiente fase funcional es el motor de detección.
+
 ## 1. Base ejecutable
 
 Crear monorepo, Compose, configuración de ejemplo sin secretos, API de salud, migraciones iniciales y shell de interfaz en español. CI con lint, tipos, pruebas y escaneo de dependencias/secretos. Dependencias fijadas y guía de arranque desde clon limpio.

@@ -25,3 +25,14 @@ Los scripts Start/Stop/Test se ejecutaron con Windows PowerShell. Se verificó d
 Pendiente de verificar: Docker Compose, PostgreSQL real, aceleración de hardware y ejecución remota de GitHub Actions. Docker no está instalado; no es requisito del arranque nativo de esta fase. Las pruebas usan SQLite; no sustituyen una integración con PostgreSQL. Starlette emite un aviso de deprecación sobre su integración de pruebas con httpx; las pruebas pasan y la API usa httpx únicamente para el diagnóstico local de Ollama.
 
 La infraestructura incluye CI para comprobaciones y escaneo de secretos. Su configuración en el repositorio no equivale a una ejecución remota aprobada.
+
+## Importación de Excel y CSV (fase 2)
+
+- 41 pruebas de API, lector, normalización y recuperación aprobadas. Incluyen CSV multilínea, UTF-8/UTF-16/Windows-1252, múltiples hojas XLSX, fórmulas, fechas ambiguas/inexistentes por DST, duplicados, límites de bytes/columnas/celdas, XML con DTD, partes ZIP inseguras y cambios de hash.
+- Se provocó un fallo después del primer lote de 500 eventos y se comprobó que la transacción no conserva eventos ni una revisión parcial.
+- Next.js, TypeScript, Ruff y comprobación de formato aprobados. Auditorías npm y pip sin vulnerabilidades conocidas reportadas en la ejecución.
+- La migración 0002 se aplicó en la instalación local y en la base de prueba; Alembic no detectó diferencias con los modelos.
+- Navegador: creación del caso sintético, carga y vista previa CSV con mapeos sugeridos comprobadas. Las comprobaciones restantes se hicieron por HTTP para no interferir con el uso simultáneo de la interfaz.
+- HTTP a través del proxy real: 4 registros sintéticos aceptados, 2 sin hora UTC válida, duplicado preservado, evidencia multilínea y SHA-256 verificados; escritura con origen externo rechazada (403).
+
+No se midió el rendimiento máximo de 100 000 registros ni se probó esta fase en PostgreSQL/Compose. El lector impone límites y un timeout, pero no es una sandbox de SO ni limita RAM a nivel del sistema. Consultar INGESTION.md para los límites y el alcance local de la cola.

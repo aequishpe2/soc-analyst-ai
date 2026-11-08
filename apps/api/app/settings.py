@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
@@ -6,6 +8,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite://"
     ollama_url: str = "http://127.0.0.1:11434"
     ai_model: str = "qwen3:8b"
+    storage_dir: Path = Path(".local/ingestion")
 
     @field_validator("ollama_url")
     @classmethod

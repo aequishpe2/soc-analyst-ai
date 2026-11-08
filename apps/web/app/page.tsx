@@ -1,5 +1,6 @@
 "use client";
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
 type Case = { id: string; title: string; timezone: string; created_at: string };
 type System = { ai_status: string; model: string };
@@ -63,9 +64,7 @@ export default function Home() {
             : "No se pudo crear el caso.",
         );
       setTitle("");
-      setNotice(
-        "Caso creado. La importación de archivos se incorporará en la siguiente fase.",
-      );
+      setNotice("Caso creado. Ábrelo para importar los registros.");
       if (offset === 0) await load();
       else setOffset(0);
     } catch (e) {
@@ -194,7 +193,9 @@ export default function Home() {
                       </p>
                       <small>{c.id}</small>
                     </div>
-                    <span className="badge">Preparación</span>
+                    <Link className="secondary" href={`/cases/${c.id}`}>
+                      Abrir caso →
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -261,7 +262,7 @@ export default function Home() {
           <div>
             {[
               ["01", "Preparar", "Crear y organizar casos", true],
-              ["02", "Importar", "Excel y CSV · Próximamente", false],
+              ["02", "Importar", "Excel y CSV", true],
               ["03", "Investigar", "Reglas e IA · Próximamente", false],
               ["04", "Informar", "Informe PDF · Próximamente", false],
             ].map(([n, t, d, active]) => (
@@ -274,7 +275,7 @@ export default function Home() {
           </div>
         </section>
         <footer>
-          Primera fase · No hay análisis de seguridad habilitado todavía.
+          Importación disponible · El análisis de seguridad sigue en desarrollo.
           <span>Las conclusiones deberán estar sustentadas en registros.</span>
         </footer>
       </main>

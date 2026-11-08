@@ -2,6 +2,8 @@
 
 Estado: especificación; umbrales iniciales sujetos a evaluación con datos sintéticos y contexto del cliente.
 
+Para el contrato efectivo de carga/importación de la fase 2, consultar INGESTION.md. Las rutas de análisis, informes, purga y autorización multiusuario de esta propuesta siguen pendientes.
+
 ## Entidades
 
 | Entidad | Campos esenciales |

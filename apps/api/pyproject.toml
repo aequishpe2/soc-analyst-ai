@@ -10,6 +10,11 @@ dependencies = [
   "alembic>=1.14,<2",
   "httpx>=0.28,<1",
   "pydantic-settings>=2.7,<3",
+  "openpyxl>=3.1.5,<4",
+  "defusedxml>=0.7.1,<1",
+  "python-multipart>=0.0.20,<1",
+  "starlette>=1.0,<2",
+  "tzdata>=2025.1",
 ]
 
 [dependency-groups]

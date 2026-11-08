@@ -51,6 +51,7 @@ $env:DATABASE_URL = 'sqlite:///' + (Join-Path $runtimeRoot 'soc.db').Replace('\'
 $env:OLLAMA_URL = 'http://127.0.0.1:11434'
 $env:AI_MODEL = 'qwen3:8b'
 $env:API_URL = 'http://127.0.0.1:8000'
+$env:STORAGE_DIR = Join-Path $runtimeRoot 'ingestion'
 $env:NEXT_TELEMETRY_DISABLED = '1'
 Push-Location (Join-Path $projectRoot 'apps/api')
 try {

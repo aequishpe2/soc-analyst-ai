@@ -1,6 +1,6 @@
 # Arquitectura propuesta
 
-Estado: diseño para la primera versión. La base de casos y el diagnóstico local están implementados; consultar LOCAL_SETUP.md y VERIFICATION.md para el alcance comprobado.
+Estado: diseño para la primera versión. Los casos, diagnóstico local e importación están implementados; consultar LOCAL_SETUP.md, INGESTION.md y VERIFICATION.md para el alcance comprobado.
 
 ## Objetivo y límites
 
@@ -21,6 +21,8 @@ Una aplicación para investigar archivos SIEM de un cliente por caso, con eviden
 | Entorno | Docker Compose | Servicios reproducibles para desarrollo local |
 
 Fijar versiones soportadas y lockfiles al implementar; revisar avisos de seguridad antes de instalarlas. Redis no será la fuente de verdad. Las tareas serán idempotentes, con estado persistente, límites y reintentos acotados.
+
+Implementación intermedia de fase 2: la instalación nativa usa cola local con estados persistentes y un lector en subproceso, sin Celery/Redis. Solo admite una instancia de API. Los motivos, límites y recuperación están documentados en INGESTION.md; el worker distribuido sigue siendo parte de la arquitectura objetivo.
 
 ## Flujo
 

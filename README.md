@@ -4,14 +4,14 @@ Aplicación web planificada para apoyar a analistas SOC Nivel 2 en el análisis 
 
 ## Estado
 
-Primera fase implementada: interfaz local, API de casos, migración inicial y diagnóstico de Ollama. La carga de logs, el análisis y el PDF todavía están pendientes.
+Implementado: casos, carga segura de Excel/CSV, vista previa, mapeo, importaciones versionadas y consulta de evidencias con trazabilidad. Ollama/Qwen3 están preparados localmente. Las detecciones, la revisión IA, el dashboard de riesgos y el PDF siguen pendientes.
 
 En el equipo de desarrollo preparado, abrir `Iniciar-SOC.cmd` y visitar `http://127.0.0.1:3000`. Usar `Detener-SOC.cmd` al terminar. Las herramientas y el modelo se instalan fuera del control de versiones; un clon nuevo requiere seguir la guía de arranque.
 
 ## Documentación
 
 - [Arranque local y verificaciones](docs/LOCAL_SETUP.md)
-
+- [Importación: uso, límites y garantías](docs/INGESTION.md)
 - [Arquitectura y decisiones técnicas](docs/ARCHITECTURE.md)
 - [Contrato analítico, modelo de datos y API](docs/ANALYSIS_SPEC.md)
 - [Plan de desarrollo y criterios de aceptación](docs/ROADMAP.md)
